@@ -22,8 +22,11 @@ src/
   hint.ts       힌트 계산 (정확/위치오류/없음)
   seed.ts       날짜 시드, 오늘의 단어 결정
   words.ts      단어 DB 로더
+  storage.ts    진행 상황/통계 저장·복원 (~/.clidle/)
+  stats.ts      누적 통계 계산 로직
+  share.ts      결과 공유 텍스트 생성 / 클립보드 복사
   types.ts      공용 타입 정의
-  render/       TUI 렌더링 컴포넌트 (title/board/result)
+  render/       TUI 렌더링 컴포넌트 (title/board/legend/result)
   data/         words_5/6/7.json 단어 DB
 scripts/
   preprocess.ts 단어 DB 전처리

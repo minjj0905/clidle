@@ -223,9 +223,10 @@ function getDailyWord(words, seed) {
 - [ ] 단어 품질 검수 (너무 생소한 단어 제거)
 
 ### Phase 4 - 마무리
-- [ ] README 작성 (설치 및 실행 방법)
-- [ ] 결과 공유 기능 (이모지 힌트 텍스트 클립보드 복사)
-- [ ] npm 패키지 배포 (`npx clidle`) 검토
+- [x] README 작성 (설치 및 실행 방법)
+- [x] 결과 공유 기능 (이모지 힌트 텍스트 클립보드 복사)
+- [x] 통계 기능 (전체 도전/정답률/연속 정답/도전 분포)
+- [ ] npm 패키지 배포 (`npx clidle`) 검토 — 단어 DB(Phase 3) 확충 이후 진행
 
 ---
 
@@ -241,13 +242,15 @@ clidle/
 │   ├── hint.ts           # 힌트 계산 로직
 │   ├── seed.ts           # 날짜 시드 / 오늘의 단어 결정
 │   ├── words.ts          # 단어 DB 로더
-│   ├── storage.ts        # 진행 상황 저장/복원 (~/.clidle/state.json)
+│   ├── storage.ts        # 진행 상황/통계 저장/복원 (~/.clidle/)
+│   ├── stats.ts          # 누적 통계 계산 로직
+│   ├── share.ts          # 결과 공유 텍스트 생성 / 클립보드 복사
 │   ├── types.ts          # 공용 타입 정의
 │   ├── render/
 │   │   ├── board.tsx     # 게임 보드 렌더링
 │   │   ├── title.tsx     # 타이틀 화면
 │   │   ├── legend.tsx    # 힌트 색상 범례
-│   │   └── result.tsx    # 결과 화면
+│   │   └── result.tsx    # 결과 화면 (통계/공유 포함)
 │   └── data/
 │       ├── words_5.json
 │       ├── words_6.json
@@ -272,6 +275,15 @@ clidle/
 ### 진행 상황 저장/복원 (구현됨)
 - `~/.clidle/state.json`에 오늘의 시드/시도 기록/상태를 매 제출마다 저장
 - 재실행 시 같은 날짜 시드면 자동 복원, 날짜가 바뀌면 새 게임 시작
+
+### 통계 (구현됨)
+- `~/.clidle/stats.json`에 전체 도전/정답 수, 현재·최다 연속 정답, 시도 횟수별 분포를 누적 저장
+- 같은 날짜 시드는 중복 집계되지 않음
+- 게임 종료 화면에 통계와 다음 문제까지 남은 시간(KST 자정 기준)을 함께 표시
+
+### 결과 공유 (구현됨)
+- 게임 종료 후 `c` 키로 `CLIDLE {시드} {시도}/{최대시도}` 헤더 + 이모지 힌트 그리드를 클립보드에 복사
+- macOS(`pbcopy`) / Windows(`clip`) / Linux(`xclip`) 지원, 실패 시 화면에 안내 메시지 표시
 
 ### 주의사항
 - Windows 기본 cmd/powershell은 ANSI 색상 지원이 불안정 → 초기엔 macOS/Linux/WSL 타겟
