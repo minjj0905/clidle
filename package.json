@@ -1,0 +1,23 @@
+{
+  "name": "clidle",
+  "version": "0.1.0",
+  "description": "터미널에서 두벌식 로마자 입력으로 한글 자모를 맞히는 CLI 단어 게임",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "clidle": "dist/index.js"
+  },
+  "scripts": {
+    "start": "tsx src/index.ts",
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^26.1.1",
+    "tsx": "^4.23.1",
+    "typescript": "^7.0.2",
+    "vitest": "^2.1.9"
+  }
+}
