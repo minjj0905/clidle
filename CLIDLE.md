@@ -241,10 +241,12 @@ clidle/
 │   ├── hint.ts           # 힌트 계산 로직
 │   ├── seed.ts           # 날짜 시드 / 오늘의 단어 결정
 │   ├── words.ts          # 단어 DB 로더
+│   ├── storage.ts        # 진행 상황 저장/복원 (~/.clidle/state.json)
 │   ├── types.ts          # 공용 타입 정의
 │   ├── render/
 │   │   ├── board.tsx     # 게임 보드 렌더링
 │   │   ├── title.tsx     # 타이틀 화면
+│   │   ├── legend.tsx    # 힌트 색상 범례
 │   │   └── result.tsx    # 결과 화면
 │   └── data/
 │       ├── words_5.json
@@ -266,6 +268,10 @@ clidle/
 - **연속 정답(streak) 기록**: 로컬 파일에 저장
 - **npx 실행**: `npx clidle` 한 줄로 실행 가능하도록 배포
 - **12슬롯 모드**: 추후 확장 가능성 열어둠
+
+### 진행 상황 저장/복원 (구현됨)
+- `~/.clidle/state.json`에 오늘의 시드/시도 기록/상태를 매 제출마다 저장
+- 재실행 시 같은 날짜 시드면 자동 복원, 날짜가 바뀌면 새 게임 시작
 
 ### 주의사항
 - Windows 기본 cmd/powershell은 ANSI 색상 지원이 불안정 → 초기엔 macOS/Linux/WSL 타겟
