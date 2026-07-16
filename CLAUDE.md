@@ -8,20 +8,22 @@
 ## 기술 스택
 
 - **언어**: Node.js (TypeScript, ES Modules) — `tsx`로 실행, `tsc`로 빌드/타입체크
-- **TUI**: 미결정 (`blessed` vs `ink` — CLIDLE.md 4절 참고)
+- **TUI**: `ink` (React 문법, 게임 상태 기반 선언적 렌더링에 적합해 선택)
 - **한글 자모**: `hangul-js` 또는 `es-hangul` (미결정)
 
 ## 디렉토리 구조
 
 ```
 src/
-  index.ts      진입점
+  index.tsx     진입점 (ink render 호출)
+  App.tsx       루트 컴포넌트, 키 입력 처리
   game.ts       게임 상태 관리
   input.ts      키 입력 / 로마자→자모 변환
   hint.ts       힌트 계산 (정확/위치오류/없음)
   seed.ts       날짜 시드, 오늘의 단어 결정
+  words.ts      단어 DB 로더
   types.ts      공용 타입 정의
-  render/       TUI 렌더링 모듈
+  render/       TUI 렌더링 컴포넌트 (title/board/result)
   data/         words_5/6/7.json 단어 DB
 scripts/
   preprocess.ts 단어 DB 전처리
