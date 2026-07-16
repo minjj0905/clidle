@@ -2,10 +2,12 @@ import { useState } from 'react';
 import { Box, Text, useApp, useInput } from 'ink';
 import { Game, GAME_STATUS, type Attempt, type GameStatus } from './game.js';
 import { RomanizationInput } from './input.js';
+import { loadSavedState, saveState } from './storage.js';
 import type { WordsBySlot } from './types.js';
 import { Title } from './render/title.js';
 import { Board } from './render/board.js';
 import { Result } from './render/result.js';
+import { Legend } from './render/legend.js';
 
 interface AppProps {
   words: WordsBySlot;
@@ -13,11 +15,19 @@ interface AppProps {
 
 export function App({ words }: AppProps) {
   const { exit } = useApp();
-  const [game] = useState(() => new Game({ words }));
+  const [game] = useState(() => {
+    const g = new Game({ words });
+    const saved = loadSavedState(g.seed);
+    if (saved) {
+      g.attempts = saved.attempts;
+      g.status = saved.status;
+    }
+    return g;
+  });
   const [inputter] = useState(() => new RomanizationInput(game.slot));
   const [currentSlots, setCurrentSlots] = useState<string[]>([]);
-  const [attempts, setAttempts] = useState<Attempt[]>([]);
-  const [status, setStatus] = useState<GameStatus>(GAME_STATUS.PLAYING);
+  const [attempts, setAttempts] = useState<Attempt[]>(() => [...game.attempts]);
+  const [status, setStatus] = useState<GameStatus>(() => game.status);
   const [message, setMessage] = useState<string | null>(null);
 
   useInput((input, key) => {
@@ -42,6 +52,7 @@ export function App({ words }: AppProps) {
       const result = game.submitGuess(currentSlots);
       setAttempts([...game.attempts]);
       setStatus(result.status);
+      saveState({ seed: game.seed, attempts: game.attempts, status: result.status });
       inputter.reset();
       setCurrentSlots([]);
       setMessage(null);
@@ -54,6 +65,7 @@ export function App({ words }: AppProps) {
   return (
     <Box flexDirection="column">
       <Title seed={game.seed} slot={game.slot} maxAttempts={game.maxAttempts} />
+      <Legend />
       <Board
         attempts={attempts}
         currentSlots={currentSlots}
