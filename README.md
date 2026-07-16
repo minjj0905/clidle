@@ -91,16 +91,18 @@ npm start
 ```
 clidle/
 ├── src/
-│   ├── index.ts          # 진입점
+│   ├── index.tsx         # 진입점 (ink render 호출)
+│   ├── App.tsx           # 루트 컴포넌트, 키 입력 처리
 │   ├── game.ts           # 게임 상태 관리
 │   ├── input.ts          # 키 입력 처리 / 로마자→자모 변환
 │   ├── hint.ts           # 힌트 계산 로직
 │   ├── seed.ts           # 날짜 시드 / 오늘의 단어 결정
+│   ├── words.ts          # 단어 DB 로더
 │   ├── types.ts          # 공용 타입 정의
 │   ├── render/
-│   │   ├── board.ts      # 게임 보드 렌더링
-│   │   ├── title.ts      # 타이틀 화면
-│   │   └── result.ts     # 결과 화면
+│   │   ├── board.tsx     # 게임 보드 렌더링
+│   │   ├── title.tsx     # 타이틀 화면
+│   │   └── result.tsx    # 결과 화면
 │   └── data/
 │       ├── words_5.json
 │       ├── words_6.json
