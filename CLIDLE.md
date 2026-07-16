@@ -102,7 +102,7 @@ CLI 환경에서 두벌식 로마자 입력으로 한글 자모를 맞히는 워
 ## 4. 기술 스택
 
 ### 확정
-- **언어**: Node.js (JavaScript)
+- **언어**: Node.js (TypeScript)
 - **실행 환경**: 터미널 (macOS / Linux / WSL)
 
 ### 후보 라이브러리 (결정 필요)
@@ -237,21 +237,23 @@ function getDailyWord(words, seed) {
 ```
 clidle/
 ├── src/
-│   ├── index.js          # 진입점
-│   ├── game.js           # 게임 상태 관리
-│   ├── input.js          # 키 입력 처리 / 로마자→자모 변환
-│   ├── hint.js           # 힌트 계산 로직
-│   ├── seed.js           # 날짜 시드 / 오늘의 단어 결정
+│   ├── index.ts          # 진입점
+│   ├── game.ts           # 게임 상태 관리
+│   ├── input.ts          # 키 입력 처리 / 로마자→자모 변환
+│   ├── hint.ts           # 힌트 계산 로직
+│   ├── seed.ts           # 날짜 시드 / 오늘의 단어 결정
+│   ├── types.ts          # 공용 타입 정의
 │   ├── render/
-│   │   ├── board.js      # 게임 보드 렌더링
-│   │   ├── title.js      # 타이틀 화면
-│   │   └── result.js     # 결과 화면
+│   │   ├── board.ts      # 게임 보드 렌더링
+│   │   ├── title.ts      # 타이틀 화면
+│   │   └── result.ts     # 결과 화면
 │   └── data/
 │       ├── words_5.json
 │       ├── words_6.json
 │       └── words_7.json
 ├── scripts/
-│   └── preprocess.js     # 단어 DB 전처리 스크립트
+│   └── preprocess.ts     # 단어 DB 전처리 스크립트
+├── tsconfig.json
 ├── package.json
 └── README.md
 ```

@@ -7,7 +7,7 @@
 
 ## 기술 스택
 
-- **언어**: Node.js (JavaScript, ES Modules)
+- **언어**: Node.js (TypeScript, ES Modules) — `tsx`로 실행, `tsc`로 빌드/타입체크
 - **TUI**: 미결정 (`blessed` vs `ink` — CLIDLE.md 4절 참고)
 - **한글 자모**: `hangul-js` 또는 `es-hangul` (미결정)
 
@@ -15,15 +15,16 @@
 
 ```
 src/
-  index.js      진입점
-  game.js       게임 상태 관리
-  input.js      키 입력 / 로마자→자모 변환
-  hint.js       힌트 계산 (정확/위치오류/없음)
-  seed.js       날짜 시드, 오늘의 단어 결정
+  index.ts      진입점
+  game.ts       게임 상태 관리
+  input.ts      키 입력 / 로마자→자모 변환
+  hint.ts       힌트 계산 (정확/위치오류/없음)
+  seed.ts       날짜 시드, 오늘의 단어 결정
+  types.ts      공용 타입 정의
   render/       TUI 렌더링 모듈
   data/         words_5/6/7.json 단어 DB
 scripts/
-  preprocess.js 단어 DB 전처리
+  preprocess.ts 단어 DB 전처리
 docs/           (gitignore — 로컬 전용 메모)
 ```
 

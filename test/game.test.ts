@@ -1,8 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { Game, GAME_STATUS } from '../src/game.js';
+import { Game, GAME_STATUS, type SubmitGuessResult } from '../src/game.js';
 import { getDateSeed, getDailySlot, getDailyWord } from '../src/seed.js';
+import type { WordsBySlot } from '../src/types.js';
 
-const words = {
+const words: WordsBySlot = {
   5: [{ display: '가을', jamo: ['ㄱ', 'ㅏ', 'ㅇ', 'ㅡ', 'ㄹ'], slot: 5 }],
   6: [{ display: '국밥', jamo: ['ㄱ', 'ㅜ', 'ㄱ', 'ㅂ', 'ㅏ', 'ㅂ'], slot: 6 }],
   7: [{ display: '고양이', jamo: ['ㄱ', 'ㅗ', 'ㅇ', 'ㅑ', 'ㅇ', 'ㅇ', 'ㅣ'], slot: 7 }],
@@ -13,7 +14,7 @@ describe('Game', () => {
     const date = new Date('2026-05-07T15:00:00Z'); // KST 2026-05-08
     const seed = getDateSeed(date);
     const expectedSlot = getDailySlot(seed);
-    const expectedWord = getDailyWord(words[expectedSlot], seed);
+    const expectedWord = getDailyWord(words[expectedSlot]!, seed);
 
     const game = new Game({ words, date });
 
@@ -37,12 +38,12 @@ describe('Game', () => {
     const game = new Game({ words, date });
     const wrongGuess = new Array(game.slot).fill('ㅁ');
 
-    let last;
+    let last: SubmitGuessResult | undefined;
     for (let i = 0; i < game.maxAttempts; i++) {
       last = game.submitGuess(wrongGuess);
     }
 
-    expect(last.status).toBe(GAME_STATUS.LOST);
+    expect(last?.status).toBe(GAME_STATUS.LOST);
     expect(game.remainingAttempts).toBe(0);
   });
 
