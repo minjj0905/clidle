@@ -37,3 +37,16 @@ export function formatSeedDate(seed: number): string {
   const dd = seed % 100;
   return `${yyyy}-${String(mm).padStart(2, '0')}-${String(dd).padStart(2, '0')}`;
 }
+
+/**
+ * 다음 KST 자정(=다음 문제 출제 시각)까지 남은 밀리초를 반환한다.
+ */
+export function getMsUntilNextSeed(date: Date = new Date()): number {
+  const kst = new Date(date.getTime() + KST_OFFSET_MS);
+  const nextMidnightKst = Date.UTC(
+    kst.getUTCFullYear(),
+    kst.getUTCMonth(),
+    kst.getUTCDate() + 1,
+  );
+  return nextMidnightKst - kst.getTime();
+}

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getDateSeed, getDailySlot, getDailyWord, formatSeedDate } from '../src/seed.js';
+import { getDateSeed, getDailySlot, getDailyWord, formatSeedDate, getMsUntilNextSeed } from '../src/seed.js';
 
 describe('getDateSeed', () => {
   it('KST 기준 날짜를 yyyymmdd 숫자로 변환한다', () => {
@@ -43,5 +43,22 @@ describe('formatSeedDate', () => {
 
   it('한 자리 월/일도 0으로 패딩한다', () => {
     expect(formatSeedDate(20260105)).toBe('2026-01-05');
+  });
+});
+
+describe('getMsUntilNextSeed', () => {
+  it('KST 자정 직전에는 1분 미만이 남는다', () => {
+    // UTC 2026-05-07 14:59:30 == KST 2026-05-07 23:59:30
+    const date = new Date('2026-05-07T14:59:30Z');
+    const ms = getMsUntilNextSeed(date);
+    expect(ms).toBeGreaterThan(0);
+    expect(ms).toBeLessThanOrEqual(30_000);
+  });
+
+  it('KST 자정 직후에는 거의 24시간이 남는다', () => {
+    // UTC 2026-05-07 15:00:00 == KST 2026-05-08 00:00:00
+    const date = new Date('2026-05-07T15:00:00Z');
+    const ms = getMsUntilNextSeed(date);
+    expect(ms).toBe(24 * 60 * 60 * 1000);
   });
 });

@@ -84,6 +84,21 @@ npm start
 | 🟨 노랑 계열 | 자모는 있으나 위치 틀림 |
 | ⬛ 어두운 계열 | 해당 자모 없음 |
 
+### 통계 & 결과 공유
+
+- 게임 종료 시 전체 도전 수, 정답률, 현재/최다 연속 정답, 시도 횟수별 분포를 보여줍니다.
+- `c` 키를 누르면 아래와 같은 형식의 결과가 클립보드에 복사됩니다.
+
+```
+CLIDLE 20260716 3/6
+
+🟪🟦⬜⬜⬜
+⬜🟪⬜🟪⬜
+🟦🟦🟦🟦🟦
+```
+
+- 진행 상황은 `~/.clidle/state.json`에, 통계는 `~/.clidle/stats.json`에 저장됩니다.
+
 ---
 
 ## 프로젝트 구조
@@ -98,13 +113,15 @@ clidle/
 │   ├── hint.ts           # 힌트 계산 로직
 │   ├── seed.ts           # 날짜 시드 / 오늘의 단어 결정
 │   ├── words.ts          # 단어 DB 로더
-│   ├── storage.ts        # 진행 상황 저장/복원 (~/.clidle/state.json)
+│   ├── storage.ts        # 진행 상황/통계 저장/복원 (~/.clidle/)
+│   ├── stats.ts          # 누적 통계 계산 로직
+│   ├── share.ts          # 결과 공유 텍스트 생성 / 클립보드 복사
 │   ├── types.ts          # 공용 타입 정의
 │   ├── render/
 │   │   ├── board.tsx     # 게임 보드 렌더링
 │   │   ├── title.tsx     # 타이틀 화면
 │   │   ├── legend.tsx    # 힌트 색상 범례
-│   │   └── result.tsx    # 결과 화면
+│   │   └── result.tsx    # 결과 화면 (통계/공유 포함)
 │   └── data/
 │       ├── words_5.json
 │       ├── words_6.json

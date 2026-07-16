@@ -2,13 +2,14 @@ import { describe, it, expect, afterEach } from 'vitest';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { loadSavedState, saveState } from '../src/storage.js';
+import { loadSavedState, saveState, loadStats, saveStats } from '../src/storage.js';
 import { HINT } from '../src/hint.js';
 import { GAME_STATUS } from '../src/game.js';
+import { EMPTY_STATS, recordResult } from '../src/stats.js';
 
-function tempFilePath(): string {
+function tempFilePath(name = 'state.json'): string {
   const dir = mkdtempSync(join(tmpdir(), 'clidle-test-'));
-  return join(dir, 'state.json');
+  return join(dir, name);
 }
 
 describe('storage', () => {
@@ -46,5 +47,30 @@ describe('storage', () => {
   it('파일이 없으면 null을 반환한다', () => {
     const filePath = tempFilePath();
     expect(loadSavedState(20260716, filePath)).toBeNull();
+  });
+});
+
+describe('stats storage', () => {
+  const createdFiles: string[] = [];
+
+  afterEach(() => {
+    for (const file of createdFiles.splice(0)) {
+      rmSync(join(file, '..'), { recursive: true, force: true });
+    }
+  });
+
+  it('저장한 통계를 그대로 다시 불러온다', () => {
+    const filePath = tempFilePath('stats.json');
+    createdFiles.push(filePath);
+
+    const stats = recordResult(EMPTY_STATS, 20260716, true, 3);
+    saveStats(stats, filePath);
+
+    expect(loadStats(filePath)).toEqual(stats);
+  });
+
+  it('파일이 없으면 빈 통계를 반환한다', () => {
+    const filePath = tempFilePath('stats.json');
+    expect(loadStats(filePath)).toEqual(EMPTY_STATS);
   });
 });
