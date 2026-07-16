@@ -104,16 +104,13 @@ CLI 환경에서 두벌식 로마자 입력으로 한글 자모를 맞히는 워
 ### 확정
 - **언어**: Node.js (TypeScript)
 - **실행 환경**: 터미널 (macOS / Linux / WSL)
+- **TUI 렌더링**: `ink` (React 문법) — 게임 상태(슬롯/힌트/시도 횟수) 변경마다 화면을 다시 그리는 구조에 선언적 컴포넌트 모델이 적합해 선택
+- **키 입력 raw mode**: `ink`의 `useInput` 훅 (내부적으로 stdin raw mode 처리)
 
 ### 후보 라이브러리 (결정 필요)
 | 용도 | 후보 A | 후보 B |
 |------|--------|--------|
-| TUI 렌더링 | `blessed` | `ink` (React 문법) |
-| 키 입력 raw mode | Node.js 내장 `readline` | `keypress` |
 | 한글 자모 분해 | `hangul-js` | `es-hangul` |
-
-> `blessed`: 전통적인 터미널 UI, 박스/색상/커서 제어 자유도 높음  
-> `ink`: React 컴포넌트 문법, 선언적이지만 러닝커브 있음
 
 ---
 
@@ -213,11 +210,11 @@ function getDailyWord(words, seed) {
 - [ ] 샘플 단어 하드코딩 (각 슬롯별 3~5개)
 
 ### Phase 2 - TUI 렌더링
-- [ ] 라이브러리 선택 (blessed vs ink 결정)
-- [ ] 타이틀 화면 (아스키아트)
-- [ ] 게임 보드 렌더링 (슬롯 칸, 힌트 색상)
-- [ ] 실시간 입력 표시 (키 누를 때마다 슬롯 업데이트)
-- [ ] 정답/실패 화면
+- [x] 라이브러리 선택 (ink 결정)
+- [x] 타이틀 화면 (아스키아트)
+- [x] 게임 보드 렌더링 (슬롯 칸, 힌트 색상)
+- [x] 실시간 입력 표시 (키 누를 때마다 슬롯 업데이트)
+- [x] 정답/실패 화면
 
 ### Phase 3 - 단어 DB
 - [ ] 공공데이터포털 / 국립국어원 데이터 수집
@@ -237,16 +234,18 @@ function getDailyWord(words, seed) {
 ```
 clidle/
 ├── src/
-│   ├── index.ts          # 진입점
+│   ├── index.tsx         # 진입점 (ink render 호출)
+│   ├── App.tsx           # 루트 컴포넌트, 키 입력 처리
 │   ├── game.ts           # 게임 상태 관리
 │   ├── input.ts          # 키 입력 처리 / 로마자→자모 변환
 │   ├── hint.ts           # 힌트 계산 로직
 │   ├── seed.ts           # 날짜 시드 / 오늘의 단어 결정
+│   ├── words.ts          # 단어 DB 로더
 │   ├── types.ts          # 공용 타입 정의
 │   ├── render/
-│   │   ├── board.ts      # 게임 보드 렌더링
-│   │   ├── title.ts      # 타이틀 화면
-│   │   └── result.ts     # 결과 화면
+│   │   ├── board.tsx     # 게임 보드 렌더링
+│   │   ├── title.tsx     # 타이틀 화면
+│   │   └── result.tsx    # 결과 화면
 │   └── data/
 │       ├── words_5.json
 │       ├── words_6.json

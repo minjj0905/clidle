@@ -26,3 +26,14 @@ export function getDailySlot(seed: number): number {
 export function getDailyWord<T>(words: T[], seed: number): T {
   return words[seed % words.length] as T;
 }
+
+/**
+ * 시드 숫자를 화면 표시용 날짜 문자열로 변환한다.
+ * @example formatSeedDate(20260716) // "2026-07-16"
+ */
+export function formatSeedDate(seed: number): string {
+  const yyyy = Math.floor(seed / 10000);
+  const mm = Math.floor((seed % 10000) / 100);
+  const dd = seed % 100;
+  return `${yyyy}-${String(mm).padStart(2, '0')}-${String(dd).padStart(2, '0')}`;
+}

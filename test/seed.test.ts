@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getDateSeed, getDailySlot, getDailyWord } from '../src/seed.js';
+import { getDateSeed, getDailySlot, getDailyWord, formatSeedDate } from '../src/seed.js';
 
 describe('getDateSeed', () => {
   it('KST 기준 날짜를 yyyymmdd 숫자로 변환한다', () => {
@@ -33,5 +33,15 @@ describe('getDailyWord', () => {
   it('시드를 단어 목록 길이로 나눈 나머지 인덱스의 단어를 반환한다', () => {
     const words = ['a', 'b', 'c'];
     expect(getDailyWord(words, 20260508)).toBe(words[20260508 % words.length]);
+  });
+});
+
+describe('formatSeedDate', () => {
+  it('시드 숫자를 yyyy-mm-dd 문자열로 변환한다', () => {
+    expect(formatSeedDate(20260716)).toBe('2026-07-16');
+  });
+
+  it('한 자리 월/일도 0으로 패딩한다', () => {
+    expect(formatSeedDate(20260105)).toBe('2026-01-05');
   });
 });
