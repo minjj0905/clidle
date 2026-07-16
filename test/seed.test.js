@@ -1,0 +1,37 @@
+import { describe, it, expect } from 'vitest';
+import { getDateSeed, getDailySlot, getDailyWord } from '../src/seed.js';
+
+describe('getDateSeed', () => {
+  it('KST 기준 날짜를 yyyymmdd 숫자로 변환한다', () => {
+    // UTC 2026-05-07 15:00 == KST 2026-05-08 00:00
+    const date = new Date('2026-05-07T15:00:00Z');
+    expect(getDateSeed(date)).toBe(20260508);
+  });
+
+  it('자정 경계에서도 KST 기준으로 계산한다', () => {
+    // UTC 2026-05-07 14:59 == KST 2026-05-07 23:59
+    const date = new Date('2026-05-07T14:59:00Z');
+    expect(getDateSeed(date)).toBe(20260507);
+  });
+});
+
+describe('getDailySlot', () => {
+  it('시드를 3으로 나눈 나머지 + 5를 반환한다', () => {
+    expect(getDailySlot(20260508)).toBe((20260508 % 3) + 5);
+  });
+
+  it('5~7 범위 안에서만 값을 반환한다', () => {
+    for (let seed = 20260101; seed < 20260110; seed++) {
+      const slot = getDailySlot(seed);
+      expect(slot).toBeGreaterThanOrEqual(5);
+      expect(slot).toBeLessThanOrEqual(7);
+    }
+  });
+});
+
+describe('getDailyWord', () => {
+  it('시드를 단어 목록 길이로 나눈 나머지 인덱스의 단어를 반환한다', () => {
+    const words = ['a', 'b', 'c'];
+    expect(getDailyWord(words, 20260508)).toBe(words[20260508 % words.length]);
+  });
+});
