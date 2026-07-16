@@ -91,21 +91,23 @@ npm start
 ```
 clidle/
 ├── src/
-│   ├── index.js          # 진입점
-│   ├── game.js           # 게임 상태 관리
-│   ├── input.js          # 키 입력 처리 / 로마자→자모 변환
-│   ├── hint.js           # 힌트 계산 로직
-│   ├── seed.js           # 날짜 시드 / 오늘의 단어 결정
+│   ├── index.ts          # 진입점
+│   ├── game.ts           # 게임 상태 관리
+│   ├── input.ts          # 키 입력 처리 / 로마자→자모 변환
+│   ├── hint.ts           # 힌트 계산 로직
+│   ├── seed.ts           # 날짜 시드 / 오늘의 단어 결정
+│   ├── types.ts          # 공용 타입 정의
 │   ├── render/
-│   │   ├── board.js      # 게임 보드 렌더링
-│   │   ├── title.js      # 타이틀 화면
-│   │   └── result.js     # 결과 화면
+│   │   ├── board.ts      # 게임 보드 렌더링
+│   │   ├── title.ts      # 타이틀 화면
+│   │   └── result.ts     # 결과 화면
 │   └── data/
 │       ├── words_5.json
 │       ├── words_6.json
 │       └── words_7.json
 ├── scripts/
-│   └── preprocess.js     # 단어 DB 전처리 스크립트
+│   └── preprocess.ts     # 단어 DB 전처리 스크립트
+├── tsconfig.json
 ├── package.json
 └── README.md
 ```
