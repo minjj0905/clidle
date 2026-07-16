@@ -98,10 +98,12 @@ clidle/
 │   ├── hint.ts           # 힌트 계산 로직
 │   ├── seed.ts           # 날짜 시드 / 오늘의 단어 결정
 │   ├── words.ts          # 단어 DB 로더
+│   ├── storage.ts        # 진행 상황 저장/복원 (~/.clidle/state.json)
 │   ├── types.ts          # 공용 타입 정의
 │   ├── render/
 │   │   ├── board.tsx     # 게임 보드 렌더링
 │   │   ├── title.tsx     # 타이틀 화면
+│   │   ├── legend.tsx    # 힌트 색상 범례
 │   │   └── result.tsx    # 결과 화면
 │   └── data/
 │       ├── words_5.json

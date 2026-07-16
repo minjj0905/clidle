@@ -20,6 +20,8 @@ export interface Attempt {
 export interface GameOptions {
   words: WordsBySlot;
   date?: Date;
+  /** 이전 세션에서 저장된 진행 상황을 복원한다 (같은 날짜 시드일 때만 유효). */
+  resume?: { attempts: Attempt[]; status: GameStatus };
 }
 
 export interface SubmitGuessResult {
@@ -38,7 +40,7 @@ export class Game {
   attempts: Attempt[];
   status: GameStatus;
 
-  constructor({ words, date = new Date() }: GameOptions) {
+  constructor({ words, date = new Date(), resume }: GameOptions) {
     const seed = getDateSeed(date);
     const slot = getDailySlot(seed);
     const wordList = words[slot];
@@ -50,8 +52,8 @@ export class Game {
     this.slot = slot;
     this.maxAttempts = MAX_ATTEMPTS_BY_SLOT[slot] as number;
     this.answer = getDailyWord(wordList, seed);
-    this.attempts = [];
-    this.status = GAME_STATUS.PLAYING;
+    this.attempts = resume?.attempts ?? [];
+    this.status = resume?.status ?? GAME_STATUS.PLAYING;
   }
 
   submitGuess(jamoArray: string[]): SubmitGuessResult {

@@ -61,4 +61,20 @@ describe('Game', () => {
 
     expect(() => game.submitGuess(['ㄱ'])).toThrow();
   });
+
+  it('resume으로 이전 시도 기록과 상태를 복원한다', () => {
+    const date = new Date('2026-05-07T15:00:00Z');
+    const original = new Game({ words, date });
+    original.submitGuess(new Array(original.slot).fill('ㅁ'));
+
+    const resumed = new Game({
+      words,
+      date,
+      resume: { attempts: original.attempts, status: original.status },
+    });
+
+    expect(resumed.attempts).toEqual(original.attempts);
+    expect(resumed.status).toBe(GAME_STATUS.PLAYING);
+    expect(resumed.remainingAttempts).toBe(resumed.maxAttempts - 1);
+  });
 });
