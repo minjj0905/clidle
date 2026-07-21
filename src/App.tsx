@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Box, Text, useApp, useInput } from 'ink';
 import { Game, GAME_STATUS, type Attempt, type GameStatus } from './game.js';
 import { RomanizationInput } from './input.js';
-import { loadSavedState, saveState, loadStats, saveStats, getOrCreateDeviceId } from './storage.js';
+import { loadSavedState, saveState, loadStats, saveStats } from './storage.js';
 import { recordResult, type Stats } from './stats.js';
 import { buildShareText, copyToClipboard } from './share.js';
 import { postStats } from './api.js';
@@ -15,11 +15,11 @@ import { Keyboard } from './render/keyboard.js';
 
 interface AppProps {
   remote: { seed: number; slot: number; maxAttempts: number; guessResolver: (guess: string[]) => Promise<Hint[]> };
+  deviceId: string;
 }
 
-export function App({ remote }: AppProps) {
+export function App({ remote, deviceId }: AppProps) {
   const { exit } = useApp();
-  const deviceId = useState(() => getOrCreateDeviceId())[0];
   const [game] = useState(() => {
     const g = new Game({ remote });
     const saved = loadSavedState(g.seed);

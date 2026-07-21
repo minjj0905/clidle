@@ -25,21 +25,24 @@ describe('submitGuess', () => {
     const body = { hint: [HINT.EXACT, HINT.ABSENT], won: false };
     const fetchImpl = vi.fn().mockResolvedValue({ ok: true, json: async () => body });
 
-    const result = await submitGuess(20260716, ['ㄱ', 'ㅏ'], 'https://example.com', fetchImpl);
+    const result = await submitGuess(20260716, ['ㄱ', 'ㅏ'], 'device-1', 'https://example.com', fetchImpl);
 
     expect(result).toEqual(body);
     expect(fetchImpl).toHaveBeenCalledWith(
       new URL('/api/guess', 'https://example.com'),
-      expect.objectContaining({ method: 'POST', body: JSON.stringify({ seed: 20260716, guess: ['ㄱ', 'ㅏ'] }) }),
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({ seed: 20260716, guess: ['ㄱ', 'ㅏ'], deviceId: 'device-1' }),
+      }),
     );
   });
 
   it('서버가 거부하면(사전에 없는 단어 등) 서버 메시지로 예외를 던진다', async () => {
     const fetchImpl = vi.fn().mockResolvedValue({ ok: false, status: 400, json: async () => ({ error: '사전에 없는 단어예요.' }) });
 
-    await expect(submitGuess(20260716, ['ㄱ', 'ㅏ'], 'https://example.com', fetchImpl)).rejects.toThrow(
-      '사전에 없는 단어예요.',
-    );
+    await expect(
+      submitGuess(20260716, ['ㄱ', 'ㅏ'], 'device-1', 'https://example.com', fetchImpl),
+    ).rejects.toThrow('사전에 없는 단어예요.');
   });
 });
 

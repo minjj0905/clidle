@@ -38,6 +38,20 @@ create table if not exists play_events (
 
 create index if not exists play_events_seed_idx on play_events (seed);
 
+-- /api/guess 브루트포스 방지: IP+시드 기준 하루 시도 횟수 상한, IP 기준 순간 요청 속도 제한에 쓴다.
+-- deviceId는 클라이언트가 임의로 새로 만들 수 있어 신뢰하지 않고 기록만 남긴다.
+create table if not exists guess_attempts (
+  id bigint generated always as identity primary key,
+  ip text not null,
+  device_id uuid,
+  seed int not null,
+  valid boolean not null,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists guess_attempts_ip_seed_idx on guess_attempts (ip, seed);
+create index if not exists guess_attempts_ip_created_idx on guess_attempts (ip, created_at);
+
 -- Supabase Auth로 로그인은 누구나 가능하지만,
 -- 실제 백오피스 API는 여기 등록된 이메일만 통과시킨다.
 create table if not exists admins (
@@ -48,4 +62,5 @@ create table if not exists admins (
 alter table words enable row level security;
 alter table daily_puzzles enable row level security;
 alter table play_events enable row level security;
+alter table guess_attempts enable row level security;
 alter table admins enable row level security;

@@ -45,13 +45,14 @@ export async function fetchToday(
 export async function submitGuess(
   seed: number,
   guess: string[],
+  deviceId?: string,
   baseUrl: string = DEFAULT_API_URL,
   fetchImpl: typeof fetch = fetch,
 ): Promise<GuessResponse> {
   const res = await fetchImpl(new URL('/api/guess', baseUrl), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ seed, guess }),
+    body: JSON.stringify({ seed, guess, deviceId }),
   });
   const body = await res.json().catch(() => null) as (GuessResponse & { error?: string }) | null;
   if (!res.ok) {
