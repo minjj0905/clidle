@@ -52,10 +52,12 @@ async function main() {
   const localDisplays = new Set(entries.map((e) => e.display));
   const existing: { id: number; display: string }[] = [];
   for (let from = 0; ; from += 1000) {
+    // range() 페이지네이션은 반드시 order()로 안정된 순서를 지정해야 페이지 간 누락이 없다.
     const { data, error: fetchError } = await supabase
       .from('words')
       .select('id, display')
       .eq('is_answer_pool', true)
+      .order('id', { ascending: true })
       .range(from, from + 999);
     if (fetchError) {
       console.error('기존 단어 목록 조회 실패:', fetchError.message);

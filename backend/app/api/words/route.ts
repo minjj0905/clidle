@@ -16,7 +16,8 @@ export async function GET(request: Request) {
 
   try {
     const rows = await fetchAllRows<{ jamo: string[] }>(
-      (client, from, to) => client.from('words').select('jamo').eq('slot', slot).eq('is_active', true).range(from, to),
+      (client, from, to) =>
+        client.from('words').select('jamo').eq('slot', slot).eq('is_active', true).order('id', { ascending: true }).range(from, to),
       supabaseAdmin(),
     );
     return NextResponse.json({ jamo: rows.map((w) => w.jamo) });
