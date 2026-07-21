@@ -15,6 +15,16 @@ Vercel(Next.js API + 관리자 백오피스) + Supabase(Postgres)로 오늘의 �
    ```
    SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... npm run import-words
    ```
+5. **(선택) 입력 가능 단어 확충** — `words.is_answer_pool` 컬럼이 필요하므로 먼저 SQL Editor에서
+   ```sql
+   alter table words add column if not exists is_answer_pool boolean not null default true;
+   ```
+   실행 후:
+   ```
+   SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... npx tsx scripts/import-nouns.ts
+   ```
+   `scripts/raw/nouns-raw.txt`(오픈소스 형태소 사전에서 추출한 대량 명사 목록)를 `is_answer_pool=false`로 이관해
+   입력(제출)은 되지만 오늘의 정답 후보로는 쓰이지 않는 단어 풀을 넓힌다.
 
 ## 로컬 실행
 

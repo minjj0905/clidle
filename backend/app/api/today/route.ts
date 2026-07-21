@@ -46,14 +46,21 @@ export async function GET(request: Request) {
   try {
     candidates = await fetchAllRows(
       (client, from, to) =>
-        client.from('words').select('id, display, jamo').eq('slot', slot).eq('is_active', true).order('id', { ascending: true }).range(from, to),
+        client
+          .from('words')
+          .select('id, display, jamo')
+          .eq('slot', slot)
+          .eq('is_active', true)
+          .eq('is_answer_pool', true)
+          .order('id', { ascending: true })
+          .range(from, to),
       supabase,
     );
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 });
   }
   if (candidates.length === 0) {
-    return NextResponse.json({ error: `슬롯 ${slot}에 활성화된 단어가 없습니다.` }, { status: 500 });
+    return NextResponse.json({ error: `슬롯 ${slot}에 정답 후보 단어가 없습니다.` }, { status: 500 });
   }
 
   const word = getDailyWord(candidates, seed);

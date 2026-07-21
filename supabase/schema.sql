@@ -7,10 +7,14 @@ create table if not exists words (
   jamo text[] not null,
   slot int not null check (slot in (5, 6, 7)),
   is_active boolean not null default true,
+  -- true: 오늘의 정답 후보 (큐레이션된 학습용 단어). false: 입력은 허용하지만
+  -- 너무 희귀해 정답으로는 부적합한 단어(대량 사전 이관분 등).
+  is_answer_pool boolean not null default true,
   created_at timestamptz not null default now()
 );
 
 create index if not exists words_slot_active_idx on words (slot, is_active);
+create index if not exists words_slot_answer_pool_idx on words (slot, is_answer_pool) where is_answer_pool;
 
 -- 하루치 정답을 고정 캐시한다. words 테이블이 나중에 바뀌어도
 -- 이미 지나간 날짜의 정답은 절대 바뀌지 않도록 하기 위함.
