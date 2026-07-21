@@ -62,6 +62,10 @@ const JONGSEONG_DECOMPOSE: Record<string, string[]> = {
   ㄽ: ['ㄹ', 'ㅅ'], ㄾ: ['ㄹ', 'ㅌ'], ㄿ: ['ㄹ', 'ㅍ'],
   ㅀ: ['ㄹ', 'ㅎ'], ㅄ: ['ㅂ', 'ㅅ'],
 };
+// 쌍자음은 같은 단자음 키를 두 번 눌러 입력하므로 슬롯도 하나로 합치지 않고 둘로 풀어 쓴다.
+const DOUBLE_TO_SINGLE: Record<string, [string, string]> = {
+  ㄲ: ['ㄱ', 'ㄱ'], ㄸ: ['ㄷ', 'ㄷ'], ㅃ: ['ㅂ', 'ㅂ'], ㅆ: ['ㅅ', 'ㅅ'], ㅉ: ['ㅈ', 'ㅈ'],
+};
 const HANGUL_BASE = 0xac00;
 const HANGUL_LAST = 0xd7a3;
 
@@ -75,8 +79,8 @@ function decomposeWord(word: string): string[] | null {
     const jung = JUNGSEONG[Math.floor((offset % (21 * 28)) / 28)];
     const jong = JONGSEONG[offset % 28];
     if (UNSUPPORTED_VOWELS.has(jung)) return null;
-    jamo.push(cho, ...(VOWEL_DECOMPOSE[jung] ?? [jung]));
-    if (jong) jamo.push(...(JONGSEONG_DECOMPOSE[jong] ?? [jong]));
+    jamo.push(...(DOUBLE_TO_SINGLE[cho] ?? [cho]), ...(VOWEL_DECOMPOSE[jung] ?? [jung]));
+    if (jong) jamo.push(...(JONGSEONG_DECOMPOSE[jong] ?? DOUBLE_TO_SINGLE[jong] ?? [jong]));
   }
   return jamo;
 }

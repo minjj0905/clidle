@@ -28,46 +28,19 @@ describe('RomanizationInput', () => {
     expect(input.slots).toEqual(['ㄱ', 'ㅏ', 'ㄴ', 'ㅏ']);
   });
 
-  it('같은 자음을 두 번 연속 입력하면 쌍자음으로 교체한다 (rr -> ㄲ)', () => {
+  it('같은 자음을 두 번 연속 입력하면 쌍자음 슬롯 두 개가 쌓인다 (rr -> ㄱ, ㄱ)', () => {
     const input = new RomanizationInput();
     input.pushKey('r');
     input.pushKey('r');
-    expect(input.slots).toEqual(['ㄲ']);
+    expect(input.slots).toEqual(['ㄱ', 'ㄱ']);
   });
 
-  it.each([
-    ['e', 'ㄸ'],
-    ['q', 'ㅃ'],
-    ['t', 'ㅆ'],
-    ['w', 'ㅉ'],
-  ])('%s%s 두 번 입력 시 쌍자음 %s로 교체한다', (key, expected) => {
-    const input = new RomanizationInput();
-    input.pushKey(key);
-    input.pushKey(key);
-    expect(input.slots).toEqual([expected]);
-  });
-
-  it('쌍자음 대상이 아닌 자음은 두 번 입력해도 두 슬롯을 유지한다', () => {
-    const input = new RomanizationInput();
-    input.pushKey('s'); // ㄴ
-    input.pushKey('s'); // ㄴ (쌍자음 없음)
-    expect(input.slots).toEqual(['ㄴ', 'ㄴ']);
-  });
-
-  it('같은 자음을 세 번 입력하면 쌍자음 후 새 슬롯이 추가된다', () => {
+  it('같은 자음을 세 번 입력하면 세 슬롯이 그대로 쌓인다', () => {
     const input = new RomanizationInput();
     input.pushKey('r');
-    input.pushKey('r'); // ㄲ
-    input.pushKey('r'); // 새 ㄱ
-    expect(input.slots).toEqual(['ㄲ', 'ㄱ']);
-  });
-
-  it('중간에 다른 키가 끼면 쌍자음으로 합치지 않는다', () => {
-    const input = new RomanizationInput();
-    input.pushKey('r'); // ㄱ
-    input.pushKey('k'); // ㅏ
-    input.pushKey('r'); // ㄱ
-    expect(input.slots).toEqual(['ㄱ', 'ㅏ', 'ㄱ']);
+    input.pushKey('r');
+    input.pushKey('r');
+    expect(input.slots).toEqual(['ㄱ', 'ㄱ', 'ㄱ']);
   });
 
   it('이중모음은 조합 없이 각각 별도 슬롯으로 쌓인다', () => {

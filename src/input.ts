@@ -11,10 +11,6 @@ export const VOWEL_MAP = {
   n: 'ㅜ', b: 'ㅠ', m: 'ㅡ', l: 'ㅣ',
 } as const;
 
-export const DOUBLE_CONSONANT_MAP: Record<string, string> = {
-  'ㄱ': 'ㄲ', 'ㄷ': 'ㄸ', 'ㅂ': 'ㅃ', 'ㅅ': 'ㅆ', 'ㅈ': 'ㅉ',
-};
-
 type ConsonantKey = keyof typeof CONSONANT_MAP;
 type VowelKey = keyof typeof VOWEL_MAP;
 
@@ -34,54 +30,34 @@ export function keyToJamo(key: string): string | null {
 
 /**
  * 두벌식 로마자 키 입력을 받아 자모 슬롯 배열을 누적하는 입력기.
- * 같은 자음 키를 연속 두 번 누르면 직전 슬롯을 쌍자음으로 교체한다.
+ * 쌍자음(ㄲㄸㅃㅆㅉ)은 같은 자음 키를 두 번 눌러 만들지만, 슬롯 데이터상으로는
+ * 하나로 합치지 않고 단자음 두 개(예: ㄱ, ㄱ)가 각각 슬롯을 차지한다.
  * 매핑되지 않은 키(한글 IME 완성형, Shift+자음 등)는 무시한다.
  */
 export class RomanizationInput {
   maxLength: number;
   slots: string[];
-  lastKey: string | null;
 
   constructor(maxLength: number = Infinity) {
     this.maxLength = maxLength;
     this.slots = [];
-    this.lastKey = null;
   }
 
   pushKey(key: string): string[] {
     const jamo = keyToJamo(key);
     if (!jamo) return this.slots;
-
-    if (isConsonantKey(key)) {
-      const canDouble =
-        this.lastKey === key &&
-        this.slots.length > 0 &&
-        this.slots[this.slots.length - 1] === CONSONANT_MAP[key] &&
-        DOUBLE_CONSONANT_MAP[CONSONANT_MAP[key]];
-
-      if (canDouble) {
-        this.slots[this.slots.length - 1] = DOUBLE_CONSONANT_MAP[CONSONANT_MAP[key]] as string;
-        // 세 번째 연속 입력은 새 자모로 취급한다.
-        this.lastKey = null;
-        return this.slots;
-      }
-    }
-
     if (this.slots.length >= this.maxLength) return this.slots;
 
     this.slots.push(jamo);
-    this.lastKey = key;
     return this.slots;
   }
 
   backspace(): string[] {
     this.slots.pop();
-    this.lastKey = null;
     return this.slots;
   }
 
   reset(): void {
     this.slots = [];
-    this.lastKey = null;
   }
 }

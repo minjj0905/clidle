@@ -30,7 +30,13 @@ const JONGSEONG_DECOMPOSE: Record<string, string[]> = {
   'ㅀ': ['ㄹ', 'ㅎ'], 'ㅄ': ['ㅂ', 'ㅅ'],
 };
 
-const ALLOWED_JAMO = new Set([...Object.values(CONSONANT_MAP), ...Object.values(VOWEL_MAP), 'ㄲ', 'ㄸ', 'ㅃ', 'ㅆ', 'ㅉ']);
+// 쌍자음(초성/종성 어느 위치든)은 입력상 같은 단자음 키를 두 번 눌러 만들므로
+// 슬롯 데이터도 하나로 합치지 않고 단자음 두 개로 풀어 쓴다 (ㄲ -> ㄱ,ㄱ).
+const DOUBLE_TO_SINGLE: Record<string, [string, string]> = {
+  'ㄲ': ['ㄱ', 'ㄱ'], 'ㄸ': ['ㄷ', 'ㄷ'], 'ㅃ': ['ㅂ', 'ㅂ'], 'ㅆ': ['ㅅ', 'ㅅ'], 'ㅉ': ['ㅈ', 'ㅈ'],
+};
+
+const ALLOWED_JAMO = new Set([...Object.values(CONSONANT_MAP), ...Object.values(VOWEL_MAP)]);
 
 // 욕설/비속어/성적 표현 및 게임에 부적합한 민감 소재(자살, 살인, 마약 등) 어근 차단
 const BLOCKED_ROOTS = [
@@ -59,8 +65,8 @@ function decomposeSyllable(char: string): string[] | null {
 
   if (UNSUPPORTED_VOWELS.has(jung)) return null;
 
-  const jamo = [cho, ...(VOWEL_DECOMPOSE[jung] ?? [jung])];
-  if (jong) jamo.push(...(JONGSEONG_DECOMPOSE[jong] ?? [jong]));
+  const jamo = [...(DOUBLE_TO_SINGLE[cho] ?? [cho]), ...(VOWEL_DECOMPOSE[jung] ?? [jung])];
+  if (jong) jamo.push(...(JONGSEONG_DECOMPOSE[jong] ?? DOUBLE_TO_SINGLE[jong] ?? [jong]));
 
   return jamo.every((j) => ALLOWED_JAMO.has(j)) ? jamo : null;
 }

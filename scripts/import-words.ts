@@ -1,8 +1,15 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
+import WebSocket from 'ws';
 import { createClient } from '@supabase/supabase-js';
 import type { WordEntry } from '../src/types.ts';
+
+// Node 20에는 전역 WebSocket이 없어 @supabase/supabase-js의 realtime 클라이언트 초기화가 실패한다.
+// 이 스크립트는 realtime을 쓰지 않지만 생성자에서 무조건 초기화하므로 폴리필로 우회한다.
+if (!globalThis.WebSocket) {
+  (globalThis as unknown as { WebSocket: typeof WebSocket }).WebSocket = WebSocket;
+}
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DATA_DIR = path.join(__dirname, '../src/data');
@@ -36,6 +43,32 @@ async function main() {
       process.exit(1);
     }
     console.log(`${i + chunk.length}/${rows.length} 완료`);
+  }
+
+  // 로컬 자모 분해 규칙이 바뀌면(예: 쌍자음 슬롯 처리 변경) 자모 5~7개 범위를 벗어나
+  // 더 이상 로컬 파일에 없는 단어가 생길 수 있다 — DB에서도 함께 제거해 동기화한다.
+  const localDisplays = new Set(entries.map((e) => e.display));
+  const { data: existing, error: fetchError } = await supabase.from('words').select('id, display');
+  if (fetchError) {
+    console.error('기존 단어 목록 조회 실패:', fetchError.message);
+    process.exit(1);
+  }
+  const staleIds = (existing ?? []).filter((w) => !localDisplays.has(w.display)).map((w) => w.id);
+
+  if (staleIds.length > 0) {
+    // 정답 캐시가 삭제될 단어를 참조하고 있으면 FK 제약에 걸리므로 먼저 비운다.
+    // 아직 사용자가 없는 사전 검증 단계라 안전하게 초기화 가능.
+    const { error: clearCacheError } = await supabase.from('daily_puzzles').delete().neq('seed', 0);
+    if (clearCacheError) {
+      console.error('daily_puzzles 초기화 실패:', clearCacheError.message);
+      process.exit(1);
+    }
+    const { error: deleteError } = await supabase.from('words').delete().in('id', staleIds);
+    if (deleteError) {
+      console.error('불필요 단어 삭제 실패:', deleteError.message);
+      process.exit(1);
+    }
+    console.log(`더 이상 조건에 맞지 않는 단어 ${staleIds.length}개 삭제, 정답 캐시 초기화`);
   }
 
   console.log('이관 완료');
