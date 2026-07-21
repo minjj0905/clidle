@@ -23,6 +23,21 @@ describe('Game', () => {
     expect(game.status).toBe(GAME_STATUS.PLAYING);
   });
 
+  it('remote로 서버가 내려준 정답을 그대로 사용한다', () => {
+    const answer = { display: '국밥', jamo: ['ㄱ', 'ㅜ', 'ㄱ', 'ㅂ', 'ㅏ', 'ㅂ'], slot: 6 };
+    const game = new Game({ remote: { seed: 20260716, slot: 6, answer, maxAttempts: 6 } });
+
+    expect(game.seed).toBe(20260716);
+    expect(game.slot).toBe(6);
+    expect(game.answer).toBe(answer);
+    expect(game.maxAttempts).toBe(6);
+    expect(game.status).toBe(GAME_STATUS.PLAYING);
+  });
+
+  it('words와 remote 둘 다 없으면 예외를 던진다', () => {
+    expect(() => new Game({})).toThrow(/words 또는 remote/);
+  });
+
   it('정답을 맞히면 WON 상태가 된다', () => {
     const date = new Date('2026-05-07T15:00:00Z');
     const game = new Game({ words, date });

@@ -1,4 +1,5 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { randomUUID } from 'node:crypto';
 import { homedir } from 'node:os';
 import { dirname, join } from 'node:path';
 import type { Attempt, GameStatus } from './game.js';
@@ -12,6 +13,7 @@ export interface SavedState {
 
 export const DEFAULT_STATE_FILE = join(homedir(), '.clidle', 'state.json');
 export const DEFAULT_STATS_FILE = join(homedir(), '.clidle', 'stats.json');
+export const DEFAULT_DEVICE_FILE = join(homedir(), '.clidle', 'device.json');
 
 /**
  * 저장된 진행 상황을 불러온다. 시드가 다르거나(=날짜가 바뀜) 파일이 없거나
@@ -66,4 +68,29 @@ export function saveStats(stats: Stats, filePath: string = DEFAULT_STATS_FILE): 
   } catch {
     // 저장 실패는 무시한다.
   }
+}
+
+/**
+ * 서버 통계 집계용 기기 식별자를 반환한다. 없으면 새로 생성해 저장한다.
+ * 저장에 실패해도(읽기 전용 파일시스템 등) 매 실행마다 새 UUID를 반환할 뿐 게임에는 영향 없다.
+ */
+export function getOrCreateDeviceId(filePath: string = DEFAULT_DEVICE_FILE): string {
+  try {
+    if (existsSync(filePath)) {
+      const parsed = JSON.parse(readFileSync(filePath, 'utf-8')) as { deviceId: string };
+      if (parsed.deviceId) return parsed.deviceId;
+    }
+  } catch {
+    // 손상된 경우 새로 생성한다.
+  }
+
+  const deviceId = randomUUID();
+  try {
+    const dir = dirname(filePath);
+    if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
+    writeFileSync(filePath, JSON.stringify({ deviceId }), 'utf-8');
+  } catch {
+    // 저장 실패는 무시한다.
+  }
+  return deviceId;
 }

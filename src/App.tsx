@@ -2,23 +2,25 @@ import { useState } from 'react';
 import { Box, Text, useApp, useInput } from 'ink';
 import { Game, GAME_STATUS, type Attempt, type GameStatus } from './game.js';
 import { RomanizationInput } from './input.js';
-import { loadSavedState, saveState, loadStats, saveStats } from './storage.js';
+import { loadSavedState, saveState, loadStats, saveStats, getOrCreateDeviceId } from './storage.js';
 import { recordResult, type Stats } from './stats.js';
 import { buildShareText, copyToClipboard } from './share.js';
-import type { WordsBySlot } from './types.js';
+import { postStats } from './api.js';
+import type { WordEntry } from './types.js';
 import { Title } from './render/title.js';
 import { Board } from './render/board.js';
 import { Result } from './render/result.js';
 import { Legend } from './render/legend.js';
 
 interface AppProps {
-  words: WordsBySlot;
+  remote: { seed: number; slot: number; answer: WordEntry; maxAttempts: number };
 }
 
-export function App({ words }: AppProps) {
+export function App({ remote }: AppProps) {
   const { exit } = useApp();
+  const deviceId = useState(() => getOrCreateDeviceId())[0];
   const [game] = useState(() => {
-    const g = new Game({ words });
+    const g = new Game({ remote });
     const saved = loadSavedState(g.seed);
     if (saved) {
       g.attempts = saved.attempts;
@@ -37,6 +39,13 @@ export function App({ words }: AppProps) {
     if (game.status === GAME_STATUS.PLAYING) return loaded;
     const updated = recordResult(loaded, game.seed, game.status === GAME_STATUS.WON, game.attempts.length);
     saveStats(updated);
+    void postStats({
+      deviceId,
+      seed: game.seed,
+      slot: game.slot,
+      won: game.status === GAME_STATUS.WON,
+      attemptCount: game.attempts.length,
+    });
     return updated;
   });
 
@@ -75,6 +84,13 @@ export function App({ words }: AppProps) {
           const updated = recordResult(prev, game.seed, result.status === GAME_STATUS.WON, game.attempts.length);
           saveStats(updated);
           return updated;
+        });
+        void postStats({
+          deviceId,
+          seed: game.seed,
+          slot: game.slot,
+          won: result.status === GAME_STATUS.WON,
+          attemptCount: game.attempts.length,
         });
       }
       inputter.reset();

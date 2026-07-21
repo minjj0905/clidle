@@ -18,8 +18,11 @@ export interface Attempt {
 }
 
 export interface GameOptions {
-  words: WordsBySlot;
+  /** 로컬 단어 DB로부터 오늘의 정답을 직접 계산한다 (테스트/오프라인용). remote와 동시 사용 불가. */
+  words?: WordsBySlot;
   date?: Date;
+  /** 서버(/api/today)가 이미 계산해 내려준 오늘의 정답을 그대로 사용한다. */
+  remote?: { seed: number; slot: number; answer: WordEntry; maxAttempts: number };
   /** 이전 세션에서 저장된 진행 상황을 복원한다 (같은 날짜 시드일 때만 유효). */
   resume?: { attempts: Attempt[]; status: GameStatus };
 }
@@ -40,18 +43,26 @@ export class Game {
   attempts: Attempt[];
   status: GameStatus;
 
-  constructor({ words, date = new Date(), resume }: GameOptions) {
-    const seed = getDateSeed(date);
-    const slot = getDailySlot(seed);
-    const wordList = words[slot];
-    if (!wordList || wordList.length === 0) {
-      throw new Error(`슬롯 ${slot}에 해당하는 단어가 없습니다.`);
-    }
+  constructor({ words, date = new Date(), remote, resume }: GameOptions) {
+    if (remote) {
+      this.seed = remote.seed;
+      this.slot = remote.slot;
+      this.maxAttempts = remote.maxAttempts;
+      this.answer = remote.answer;
+    } else {
+      if (!words) throw new Error('words 또는 remote 중 하나는 반드시 지정해야 합니다.');
+      const seed = getDateSeed(date);
+      const slot = getDailySlot(seed);
+      const wordList = words[slot];
+      if (!wordList || wordList.length === 0) {
+        throw new Error(`슬롯 ${slot}에 해당하는 단어가 없습니다.`);
+      }
 
-    this.seed = seed;
-    this.slot = slot;
-    this.maxAttempts = MAX_ATTEMPTS_BY_SLOT[slot] as number;
-    this.answer = getDailyWord(wordList, seed);
+      this.seed = seed;
+      this.slot = slot;
+      this.maxAttempts = MAX_ATTEMPTS_BY_SLOT[slot] as number;
+      this.answer = getDailyWord(wordList, seed);
+    }
     this.attempts = resume?.attempts ?? [];
     this.status = resume?.status ?? GAME_STATUS.PLAYING;
   }

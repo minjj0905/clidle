@@ -2,7 +2,7 @@ import { describe, it, expect, afterEach } from 'vitest';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { loadSavedState, saveState, loadStats, saveStats } from '../src/storage.js';
+import { loadSavedState, saveState, loadStats, saveStats, getOrCreateDeviceId } from '../src/storage.js';
 import { HINT } from '../src/hint.js';
 import { GAME_STATUS } from '../src/game.js';
 import { EMPTY_STATS, recordResult } from '../src/stats.js';
@@ -72,5 +72,24 @@ describe('stats storage', () => {
   it('파일이 없으면 빈 통계를 반환한다', () => {
     const filePath = tempFilePath('stats.json');
     expect(loadStats(filePath)).toEqual(EMPTY_STATS);
+  });
+});
+
+describe('device id storage', () => {
+  const createdFiles: string[] = [];
+
+  afterEach(() => {
+    for (const file of createdFiles.splice(0)) {
+      rmSync(join(file, '..'), { recursive: true, force: true });
+    }
+  });
+
+  it('파일이 없으면 새 UUID를 생성해 저장한다', () => {
+    const filePath = tempFilePath('device.json');
+    createdFiles.push(filePath);
+
+    const deviceId = getOrCreateDeviceId(filePath);
+    expect(deviceId).toMatch(/^[0-9a-f-]{36}$/);
+    expect(getOrCreateDeviceId(filePath)).toBe(deviceId);
   });
 });
