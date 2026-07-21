@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '../../../lib/supabase-admin';
 import { getDateSeed, getDailySlot, getDailyWord } from '../../../lib/seed';
+import { fetchAllRows } from '../../../lib/fetch-all';
 
 const MAX_ATTEMPTS_BY_SLOT: Record<number, number> = { 5: 6, 6: 6, 7: 7 };
 
@@ -40,17 +41,18 @@ export async function GET(request: Request) {
     });
   }
 
-  const { data: candidates, error: candidatesError } = await supabase
-    .from('words')
-    .select('id, display, jamo')
-    .eq('slot', slot)
-    .eq('is_active', true)
-    .order('id', { ascending: true });
-
-  if (candidatesError) {
-    return NextResponse.json({ error: candidatesError.message }, { status: 500 });
+  // PostgREST 기본 응답 행 수 상한(1000)에 걸리면 후보군이 잘려 정답 선택이 어긋나므로 페이지네이션으로 전체를 모은다.
+  let candidates: { id: number; display: string; jamo: string[] }[];
+  try {
+    candidates = await fetchAllRows(
+      (client, from, to) =>
+        client.from('words').select('id, display, jamo').eq('slot', slot).eq('is_active', true).order('id', { ascending: true }).range(from, to),
+      supabase,
+    );
+  } catch (err) {
+    return NextResponse.json({ error: (err as Error).message }, { status: 500 });
   }
-  if (!candidates || candidates.length === 0) {
+  if (candidates.length === 0) {
     return NextResponse.json({ error: `슬롯 ${slot}에 활성화된 단어가 없습니다.` }, { status: 500 });
   }
 

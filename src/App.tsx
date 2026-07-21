@@ -6,6 +6,7 @@ import { loadSavedState, saveState, loadStats, saveStats, getOrCreateDeviceId } 
 import { recordResult, type Stats } from './stats.js';
 import { buildShareText, copyToClipboard } from './share.js';
 import { postStats } from './api.js';
+import { buildDictionary, isValidGuess } from './dictionary.js';
 import type { WordEntry } from './types.js';
 import { Title } from './render/title.js';
 import { Board } from './render/board.js';
@@ -14,10 +15,12 @@ import { Legend } from './render/legend.js';
 
 interface AppProps {
   remote: { seed: number; slot: number; answer: WordEntry; maxAttempts: number };
+  validWords: string[][];
 }
 
-export function App({ remote }: AppProps) {
+export function App({ remote, validWords }: AppProps) {
   const { exit } = useApp();
+  const dictionary = useState(() => buildDictionary(validWords))[0];
   const deviceId = useState(() => getOrCreateDeviceId())[0];
   const [game] = useState(() => {
     const g = new Game({ remote });
@@ -73,6 +76,10 @@ export function App({ remote }: AppProps) {
     if (key.return) {
       if (currentSlots.length !== game.slot) {
         setMessage(`자모 ${game.slot}개를 모두 입력해주세요.`);
+        return;
+      }
+      if (!isValidGuess(currentSlots, dictionary)) {
+        setMessage('사전에 없는 단어예요.');
         return;
       }
       const result = game.submitGuess(currentSlots);

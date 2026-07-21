@@ -47,13 +47,20 @@ async function main() {
 
   // 로컬 자모 분해 규칙이 바뀌면(예: 쌍자음 슬롯 처리 변경) 자모 5~7개 범위를 벗어나
   // 더 이상 로컬 파일에 없는 단어가 생길 수 있다 — DB에서도 함께 제거해 동기화한다.
+  // PostgREST 기본 응답 행 수 상한(1000)에 걸리지 않도록 페이지네이션으로 전체를 가져온다.
   const localDisplays = new Set(entries.map((e) => e.display));
-  const { data: existing, error: fetchError } = await supabase.from('words').select('id, display');
-  if (fetchError) {
-    console.error('기존 단어 목록 조회 실패:', fetchError.message);
-    process.exit(1);
+  const existing: { id: number; display: string }[] = [];
+  for (let from = 0; ; from += 1000) {
+    const { data, error: fetchError } = await supabase.from('words').select('id, display').range(from, from + 999);
+    if (fetchError) {
+      console.error('기존 단어 목록 조회 실패:', fetchError.message);
+      process.exit(1);
+    }
+    if (!data || data.length === 0) break;
+    existing.push(...data);
+    if (data.length < 1000) break;
   }
-  const staleIds = (existing ?? []).filter((w) => !localDisplays.has(w.display)).map((w) => w.id);
+  const staleIds = existing.filter((w) => !localDisplays.has(w.display)).map((w) => w.id);
 
   if (staleIds.length > 0) {
     // 정답 캐시가 삭제될 단어를 참조하고 있으면 FK 제약에 걸리므로 먼저 비운다.

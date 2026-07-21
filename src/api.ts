@@ -32,6 +32,25 @@ export async function fetchTodayWord(
 }
 
 /**
+ * 슬롯(자모 개수)에 해당하는 유효 단어 목록의 자모 배열을 받아온다.
+ * 사전에 없는 자모 조합의 제출을 막는 데 사용한다. 실패 시 예외를 던진다.
+ */
+export async function fetchValidWords(
+  slot: number,
+  baseUrl: string = DEFAULT_API_URL,
+  fetchImpl: typeof fetch = fetch,
+): Promise<string[][]> {
+  const url = new URL('/api/words', baseUrl);
+  url.searchParams.set('slot', String(slot));
+  const res = await fetchImpl(url);
+  if (!res.ok) {
+    throw new Error(`단어 목록을 가져오지 못했습니다 (HTTP ${res.status}). 네트워크 연결을 확인해주세요.`);
+  }
+  const body = (await res.json()) as { jamo: string[][] };
+  return body.jamo;
+}
+
+/**
  * 게임 결과를 서버 통계로 전송한다. 실패해도 로컬 통계/게임 진행에는 영향을 주지 않는다.
  */
 export async function postStats(

@@ -21,21 +21,20 @@
 - Node.js 18 이상
 - macOS / Linux / WSL (Windows 기본 cmd/PowerShell 미지원)
 - 한글 폰트를 지원하는 터미널 (iTerm2, Wezterm, Windows Terminal 등)
+- 인터넷 연결 (오늘의 단어를 서버에서 받아옴)
 
 ---
 
 ## 설치 및 실행
 
 ```bash
-# npx로 바로 실행 (배포 후)
-npx clidle
-
-# 또는 로컬 클론 후 실행
 git clone https://github.com/minjj0905/clidle.git
 cd clidle
 npm install
 npm start
 ```
+
+`npx clidle`로 바로 실행하는 배포는 준비 중입니다.
 
 ---
 
@@ -68,13 +67,13 @@ npm start
 | p | ㅔ | u | ㅕ | h | ㅗ | y | ㅛ |
 | n | ㅜ | b | ㅠ | m | ㅡ | l | ㅣ |
 
-**쌍자음** — 같은 자음 키를 두 번 입력
+**쌍자음** — 같은 자음 키를 두 번 입력하면 단자음 두 슬롯이 쌓입니다 (예: `rr` → `ㄱ`, `ㄱ`)
 
 | 입력 | 결과 | 입력 | 결과 |
 |------|------|------|------|
-| rr | ㄲ | ee | ㄸ |
-| qq | ㅃ | tt | ㅆ |
-| ww | ㅉ | | |
+| rr | ㄱ, ㄱ | ee | ㄷ, ㄷ |
+| qq | ㅂ, ㅂ | tt | ㅅ, ㅅ |
+| ww | ㅈ, ㅈ | | |
 
 ### 힌트
 
