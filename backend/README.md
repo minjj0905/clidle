@@ -45,6 +45,7 @@ Vercel 프로젝트 생성 시 **Root Directory를 `backend`로 지정**. 환경
 
 ## 엔드포인트
 
-- `GET /api/today?date=YYYY-MM-DD` — 오늘(또는 지정 날짜)의 단어. 최초 조회 시 `daily_puzzles`에 고정 캐시되어 이후 `words` 테이블이 바뀌어도 과거 정답은 변하지 않는다.
+- `GET /api/today?date=YYYY-MM-DD` — 오늘(또는 지정 날짜)의 슬롯/시도 횟수만 반환 (`{ seed, slot, maxAttempts }`). **정답은 절대 포함하지 않는다.** 최초 조회 시 `daily_puzzles`에 고정 캐시되어 이후 `words` 테이블이 바뀌어도 과거 정답은 변하지 않는다.
+- `POST /api/guess` — 추측 채점 (`{ seed, guess }` → `{ hint, won }`). 사전 검증(등재된 단어인지)과 정답 비교 모두 서버에서만 수행하며, 응답에 정답은 절대 포함되지 않는다.
 - `POST /api/stats` — 게임 결과 기록 (`{ deviceId, seed, slot, won, attemptCount }`)
 - `/admin/login`, `/admin/words`, `/admin/stats` — 관리자 백오피스 (Supabase Auth 이메일 로그인 + `admins` 화이트리스트)

@@ -1,12 +1,13 @@
 import { describe, it, expect, vi } from 'vitest';
-import { fetchTodayWord, fetchValidWords, postStats } from '../src/api.js';
+import { fetchToday, submitGuess, postStats } from '../src/api.js';
+import { HINT } from '../src/hint.js';
 
-describe('fetchTodayWord', () => {
-  it('응답 본문을 그대로 반환한다', async () => {
-    const body = { seed: 20260716, slot: 6, jamo: ['ㄱ', 'ㅏ'], display: '가', maxAttempts: 6 };
+describe('fetchToday', () => {
+  it('응답 본문을 그대로 반환한다 (정답은 포함되지 않는다)', async () => {
+    const body = { seed: 20260716, slot: 6, maxAttempts: 6 };
     const fetchImpl = vi.fn().mockResolvedValue({ ok: true, json: async () => body });
 
-    const result = await fetchTodayWord('https://example.com', fetchImpl);
+    const result = await fetchToday('https://example.com', fetchImpl);
 
     expect(result).toEqual(body);
     expect(fetchImpl).toHaveBeenCalledWith(new URL('/api/today', 'https://example.com'));
@@ -15,27 +16,30 @@ describe('fetchTodayWord', () => {
   it('응답이 실패하면 예외를 던진다', async () => {
     const fetchImpl = vi.fn().mockResolvedValue({ ok: false, status: 500 });
 
-    await expect(fetchTodayWord('https://example.com', fetchImpl)).rejects.toThrow(/500/);
+    await expect(fetchToday('https://example.com', fetchImpl)).rejects.toThrow(/500/);
   });
 });
 
-describe('fetchValidWords', () => {
-  it('slot 쿼리와 함께 요청해 자모 배열 목록을 반환한다', async () => {
-    const jamo = [['ㄱ', 'ㅏ', 'ㅇ', 'ㅡ', 'ㄹ']];
-    const fetchImpl = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ jamo }) });
+describe('submitGuess', () => {
+  it('시드와 추측을 POST하고 힌트/승리 여부를 반환한다', async () => {
+    const body = { hint: [HINT.EXACT, HINT.ABSENT], won: false };
+    const fetchImpl = vi.fn().mockResolvedValue({ ok: true, json: async () => body });
 
-    const result = await fetchValidWords(5, 'https://example.com', fetchImpl);
+    const result = await submitGuess(20260716, ['ㄱ', 'ㅏ'], 'https://example.com', fetchImpl);
 
-    expect(result).toEqual(jamo);
-    const calledUrl = fetchImpl.mock.calls[0]?.[0] as URL;
-    expect(calledUrl.pathname).toBe('/api/words');
-    expect(calledUrl.searchParams.get('slot')).toBe('5');
+    expect(result).toEqual(body);
+    expect(fetchImpl).toHaveBeenCalledWith(
+      new URL('/api/guess', 'https://example.com'),
+      expect.objectContaining({ method: 'POST', body: JSON.stringify({ seed: 20260716, guess: ['ㄱ', 'ㅏ'] }) }),
+    );
   });
 
-  it('응답이 실패하면 예외를 던진다', async () => {
-    const fetchImpl = vi.fn().mockResolvedValue({ ok: false, status: 500 });
+  it('서버가 거부하면(사전에 없는 단어 등) 서버 메시지로 예외를 던진다', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue({ ok: false, status: 400, json: async () => ({ error: '사전에 없는 단어예요.' }) });
 
-    await expect(fetchValidWords(5, 'https://example.com', fetchImpl)).rejects.toThrow(/500/);
+    await expect(submitGuess(20260716, ['ㄱ', 'ㅏ'], 'https://example.com', fetchImpl)).rejects.toThrow(
+      '사전에 없는 단어예요.',
+    );
   });
 });
 

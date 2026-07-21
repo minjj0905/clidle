@@ -1,21 +1,22 @@
 #!/usr/bin/env node
 import { render, Text } from 'ink';
 import { App } from './App.js';
-import { fetchTodayWord, fetchValidWords } from './api.js';
+import { fetchToday, submitGuess } from './api.js';
 
 async function main() {
   try {
-    const today = await fetchTodayWord();
-    const validWords = await fetchValidWords(today.slot);
+    const today = await fetchToday();
     render(
       <App
         remote={{
           seed: today.seed,
           slot: today.slot,
-          answer: { display: today.display, jamo: today.jamo, slot: today.slot },
           maxAttempts: today.maxAttempts,
+          guessResolver: async (guess) => {
+            const result = await submitGuess(today.seed, guess);
+            return result.hint;
+          },
         }}
-        validWords={validWords}
       />,
     );
   } catch (err) {

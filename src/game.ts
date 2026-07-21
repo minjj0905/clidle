@@ -21,8 +21,12 @@ export interface GameOptions {
   /** 로컬 단어 DB로부터 오늘의 정답을 직접 계산한다 (테스트/오프라인용). remote와 동시 사용 불가. */
   words?: WordsBySlot;
   date?: Date;
-  /** 서버(/api/today)가 이미 계산해 내려준 오늘의 정답을 그대로 사용한다. */
-  remote?: { seed: number; slot: number; answer: WordEntry; maxAttempts: number };
+  /**
+   * 서버에 정답을 맡기고 추측 채점만 요청한다. 정답 자체는 클라이언트에 절대 내려오지
+   * 않으며, 사전 검증(등재된 단어인지)도 서버에서만 이뤄진다. 사전에 없는 단어 등
+   * 서버가 거부한 경우 guessResolver가 reject한다.
+   */
+  remote?: { seed: number; slot: number; maxAttempts: number; guessResolver: (guess: string[]) => Promise<Hint[]> };
   /** 이전 세션에서 저장된 진행 상황을 복원한다 (같은 날짜 시드일 때만 유효). */
   resume?: { attempts: Attempt[]; status: GameStatus };
 }
@@ -39,16 +43,17 @@ export class Game {
   seed: number;
   slot: number;
   maxAttempts: number;
-  answer: WordEntry;
   attempts: Attempt[];
   status: GameStatus;
+  private answer?: WordEntry;
+  private guessResolver?: (guess: string[]) => Promise<Hint[]>;
 
   constructor({ words, date = new Date(), remote, resume }: GameOptions) {
     if (remote) {
       this.seed = remote.seed;
       this.slot = remote.slot;
       this.maxAttempts = remote.maxAttempts;
-      this.answer = remote.answer;
+      this.guessResolver = remote.guessResolver;
     } else {
       if (!words) throw new Error('words 또는 remote 중 하나는 반드시 지정해야 합니다.');
       const seed = getDateSeed(date);
@@ -67,7 +72,7 @@ export class Game {
     this.status = resume?.status ?? GAME_STATUS.PLAYING;
   }
 
-  submitGuess(jamoArray: string[]): SubmitGuessResult {
+  async submitGuess(jamoArray: string[]): Promise<SubmitGuessResult> {
     if (this.status !== GAME_STATUS.PLAYING) {
       throw new Error('게임이 이미 종료되었습니다.');
     }
@@ -75,7 +80,7 @@ export class Game {
       throw new Error(`자모 ${this.slot}개를 입력해야 합니다.`);
     }
 
-    const hint = calculateHint(jamoArray, this.answer.jamo);
+    const hint = this.answer ? calculateHint(jamoArray, this.answer.jamo) : await this.guessResolver!(jamoArray);
     this.attempts.push({ guess: jamoArray, hint });
 
     if (hint.every((h) => h === HINT.EXACT)) {
