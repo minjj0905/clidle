@@ -16,6 +16,8 @@ export function Legend() {
       <Text color={HINT_COLOR[HINT.ABSENT]} bold>
         ■ 없음
       </Text>
+      <Text>{'  '}</Text>
+      <Text>■ 미입력</Text>
     </Box>
   );
 }

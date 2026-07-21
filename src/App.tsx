@@ -12,6 +12,7 @@ import { Title } from './render/title.js';
 import { Board } from './render/board.js';
 import { Result } from './render/result.js';
 import { Legend } from './render/legend.js';
+import { Keyboard } from './render/keyboard.js';
 
 interface AppProps {
   remote: { seed: number; slot: number; answer: WordEntry; maxAttempts: number };
@@ -125,6 +126,7 @@ export function App({ remote, validWords }: AppProps) {
           {message}
         </Text>
       )}
+      <Keyboard attempts={attempts} />
       {status !== GAME_STATUS.PLAYING && (
         <Result
           status={status}
