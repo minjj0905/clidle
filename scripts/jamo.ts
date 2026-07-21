@@ -5,15 +5,15 @@ const CHOSEONG = ['ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ',
 const JUNGSEONG = ['ㅏ', 'ㅐ', 'ㅑ', 'ㅒ', 'ㅓ', 'ㅔ', 'ㅕ', 'ㅖ', 'ㅗ', 'ㅘ', 'ㅙ', 'ㅚ', 'ㅛ', 'ㅜ', 'ㅝ', 'ㅞ', 'ㅟ', 'ㅠ', 'ㅡ', 'ㅢ', 'ㅣ'];
 const JONGSEONG = ['', 'ㄱ', 'ㄲ', 'ㄳ', 'ㄴ', 'ㄵ', 'ㄶ', 'ㄷ', 'ㄹ', 'ㄺ', 'ㄻ', 'ㄼ', 'ㄽ', 'ㄾ', 'ㄿ', 'ㅀ', 'ㅁ', 'ㅂ', 'ㅄ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'];
 
-// CLIDLE 입력 규칙(두벌식 단일 키 입력)에 맞춰 겹모음/겹받침을 게임에서 허용하는
-// 기본 자모(단자음 14 + 쌍자음 5 + 단모음 12) 조합으로 풀어 쓴다.
+// 게임 키보드에는 전용 키가 있는 기본 모음 10개(ㅏㅑㅓㅕㅗㅛㅜㅠㅡㅣ)만 있고,
+// 나머지 11개 겹모음은 전용 키가 없어 이 10개를 조합해 만든다.
+// ㅐ=ㅏ+ㅣ, ㅔ=ㅓ+ㅣ, ㅒ=ㅑ+ㅣ, ㅖ=ㅕ+ㅣ이므로 ㅙ(ㅗ+ㅐ), ㅞ(ㅜ+ㅔ)는 3개로 풀린다.
 const VOWEL_DECOMPOSE: Record<string, string[]> = {
-  'ㅘ': ['ㅗ', 'ㅏ'], 'ㅙ': ['ㅗ', 'ㅐ'], 'ㅚ': ['ㅗ', 'ㅣ'],
-  'ㅝ': ['ㅜ', 'ㅓ'], 'ㅞ': ['ㅜ', 'ㅔ'], 'ㅟ': ['ㅜ', 'ㅣ'],
+  'ㅐ': ['ㅏ', 'ㅣ'], 'ㅒ': ['ㅑ', 'ㅣ'], 'ㅔ': ['ㅓ', 'ㅣ'], 'ㅖ': ['ㅕ', 'ㅣ'],
+  'ㅘ': ['ㅗ', 'ㅏ'], 'ㅙ': ['ㅗ', 'ㅏ', 'ㅣ'], 'ㅚ': ['ㅗ', 'ㅣ'],
+  'ㅝ': ['ㅜ', 'ㅓ'], 'ㅞ': ['ㅜ', 'ㅓ', 'ㅣ'], 'ㅟ': ['ㅜ', 'ㅣ'],
   'ㅢ': ['ㅡ', 'ㅣ'],
 };
-// ㅒ, ㅖ는 두벌식 키 조합(VOWEL_MAP)에 대응 키가 없어 타이핑 불가 → 해당 단어는 제외
-const UNSUPPORTED_VOWELS = new Set(['ㅒ', 'ㅖ']);
 
 const JONGSEONG_DECOMPOSE: Record<string, string[]> = {
   'ㄳ': ['ㄱ', 'ㅅ'], 'ㄵ': ['ㄴ', 'ㅈ'], 'ㄶ': ['ㄴ', 'ㅎ'],
@@ -54,8 +54,6 @@ function decomposeSyllable(char: string): string[] | null {
   const cho = CHOSEONG[Math.floor(offset / (21 * 28))];
   const jung = JUNGSEONG[Math.floor((offset % (21 * 28)) / 28)];
   const jong = JONGSEONG[offset % 28];
-
-  if (UNSUPPORTED_VOWELS.has(jung)) return null;
 
   const jamo = [...(DOUBLE_TO_SINGLE[cho] ?? [cho]), ...(VOWEL_DECOMPOSE[jung] ?? [jung])];
   if (jong) jamo.push(...(JONGSEONG_DECOMPOSE[jong] ?? DOUBLE_TO_SINGLE[jong] ?? [jong]));

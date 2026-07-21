@@ -5,10 +5,12 @@ export const CONSONANT_MAP = {
   v: 'ㅍ', g: 'ㅎ',
 } as const;
 
+// 전용 키가 있는 기본 모음 10개만 직접 입력 가능하다. ㅐㅒㅔㅖㅘㅙㅚㅝㅞㅟㅢ 등 나머지
+// 모음은 전용 키가 없으므로 이 10개를 조합해 만든다 (예: ㅐ = ㅏ + ㅣ, ㅘ = ㅗ + ㅏ).
 export const VOWEL_MAP = {
-  k: 'ㅏ', o: 'ㅐ', i: 'ㅑ', j: 'ㅓ',
-  p: 'ㅔ', u: 'ㅕ', h: 'ㅗ', y: 'ㅛ',
-  n: 'ㅜ', b: 'ㅠ', m: 'ㅡ', l: 'ㅣ',
+  k: 'ㅏ', i: 'ㅑ', j: 'ㅓ', u: 'ㅕ',
+  h: 'ㅗ', y: 'ㅛ', n: 'ㅜ', b: 'ㅠ',
+  m: 'ㅡ', l: 'ㅣ',
 } as const;
 
 type ConsonantKey = keyof typeof CONSONANT_MAP;

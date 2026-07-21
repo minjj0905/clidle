@@ -51,11 +51,11 @@ const CHOSEONG = ['ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ',
 const JUNGSEONG = ['ㅏ', 'ㅐ', 'ㅑ', 'ㅒ', 'ㅓ', 'ㅔ', 'ㅕ', 'ㅖ', 'ㅗ', 'ㅘ', 'ㅙ', 'ㅚ', 'ㅛ', 'ㅜ', 'ㅝ', 'ㅞ', 'ㅟ', 'ㅠ', 'ㅡ', 'ㅢ', 'ㅣ'];
 const JONGSEONG = ['', 'ㄱ', 'ㄲ', 'ㄳ', 'ㄴ', 'ㄵ', 'ㄶ', 'ㄷ', 'ㄹ', 'ㄺ', 'ㄻ', 'ㄼ', 'ㄽ', 'ㄾ', 'ㄿ', 'ㅀ', 'ㅁ', 'ㅂ', 'ㅄ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'];
 const VOWEL_DECOMPOSE: Record<string, string[]> = {
-  ㅘ: ['ㅗ', 'ㅏ'], ㅙ: ['ㅗ', 'ㅐ'], ㅚ: ['ㅗ', 'ㅣ'],
-  ㅝ: ['ㅜ', 'ㅓ'], ㅞ: ['ㅜ', 'ㅔ'], ㅟ: ['ㅜ', 'ㅣ'],
+  ㅐ: ['ㅏ', 'ㅣ'], ㅒ: ['ㅑ', 'ㅣ'], ㅔ: ['ㅓ', 'ㅣ'], ㅖ: ['ㅕ', 'ㅣ'],
+  ㅘ: ['ㅗ', 'ㅏ'], ㅙ: ['ㅗ', 'ㅏ', 'ㅣ'], ㅚ: ['ㅗ', 'ㅣ'],
+  ㅝ: ['ㅜ', 'ㅓ'], ㅞ: ['ㅜ', 'ㅓ', 'ㅣ'], ㅟ: ['ㅜ', 'ㅣ'],
   ㅢ: ['ㅡ', 'ㅣ'],
 };
-const UNSUPPORTED_VOWELS = new Set(['ㅒ', 'ㅖ']);
 const JONGSEONG_DECOMPOSE: Record<string, string[]> = {
   ㄳ: ['ㄱ', 'ㅅ'], ㄵ: ['ㄴ', 'ㅈ'], ㄶ: ['ㄴ', 'ㅎ'],
   ㄺ: ['ㄹ', 'ㄱ'], ㄻ: ['ㄹ', 'ㅁ'], ㄼ: ['ㄹ', 'ㅂ'],
@@ -78,7 +78,6 @@ function decomposeWord(word: string): string[] | null {
     const cho = CHOSEONG[Math.floor(offset / (21 * 28))];
     const jung = JUNGSEONG[Math.floor((offset % (21 * 28)) / 28)];
     const jong = JONGSEONG[offset % 28];
-    if (UNSUPPORTED_VOWELS.has(jung)) return null;
     jamo.push(...(DOUBLE_TO_SINGLE[cho] ?? [cho]), ...(VOWEL_DECOMPOSE[jung] ?? [jung]));
     if (jong) jamo.push(...(JONGSEONG_DECOMPOSE[jong] ?? DOUBLE_TO_SINGLE[jong] ?? [jong]));
   }

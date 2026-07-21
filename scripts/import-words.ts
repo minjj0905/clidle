@@ -47,11 +47,16 @@ async function main() {
 
   // 로컬 자모 분해 규칙이 바뀌면(예: 쌍자음 슬롯 처리 변경) 자모 5~7개 범위를 벗어나
   // 더 이상 로컬 파일에 없는 단어가 생길 수 있다 — DB에서도 함께 제거해 동기화한다.
+  // is_answer_pool=false(대량 명사 사전)는 이 로컬 파일과 무관하므로 건드리지 않는다.
   // PostgREST 기본 응답 행 수 상한(1000)에 걸리지 않도록 페이지네이션으로 전체를 가져온다.
   const localDisplays = new Set(entries.map((e) => e.display));
   const existing: { id: number; display: string }[] = [];
   for (let from = 0; ; from += 1000) {
-    const { data, error: fetchError } = await supabase.from('words').select('id, display').range(from, from + 999);
+    const { data, error: fetchError } = await supabase
+      .from('words')
+      .select('id, display')
+      .eq('is_answer_pool', true)
+      .range(from, from + 999);
     if (fetchError) {
       console.error('기존 단어 목록 조회 실패:', fetchError.message);
       process.exit(1);
@@ -70,10 +75,15 @@ async function main() {
       console.error('daily_puzzles 초기화 실패:', clearCacheError.message);
       process.exit(1);
     }
-    const { error: deleteError } = await supabase.from('words').delete().in('id', staleIds);
-    if (deleteError) {
-      console.error('불필요 단어 삭제 실패:', deleteError.message);
-      process.exit(1);
+    // URL 길이 제한(414)에 걸리지 않도록 청크 단위로 삭제한다.
+    const DELETE_CHUNK = 200;
+    for (let i = 0; i < staleIds.length; i += DELETE_CHUNK) {
+      const chunk = staleIds.slice(i, i + DELETE_CHUNK);
+      const { error: deleteError } = await supabase.from('words').delete().in('id', chunk);
+      if (deleteError) {
+        console.error(`불필요 단어 삭제 실패 (${i}~${i + chunk.length}):`, deleteError.message);
+        process.exit(1);
+      }
     }
     console.log(`더 이상 조건에 맞지 않는 단어 ${staleIds.length}개 삭제, 정답 캐시 초기화`);
   }
