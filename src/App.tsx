@@ -41,7 +41,7 @@ export function App({ words }: AppProps) {
   });
 
   useInput((input, key) => {
-    if (key.escape || input === 'q') {
+    if (key.escape || (key.ctrl && input === 'c')) {
       exit();
       return;
     }
