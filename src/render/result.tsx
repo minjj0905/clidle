@@ -1,14 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Box, Text } from 'ink';
 import { GAME_STATUS, type GameStatus } from '../game.js';
-import type { WordEntry } from '../types.js';
 import type { Stats } from '../stats.js';
 import { winRate } from '../stats.js';
 import { getMsUntilNextSeed } from '../seed.js';
 
 interface ResultProps {
   status: GameStatus;
-  answer: WordEntry;
   maxAttempts: number;
   stats: Stats;
   copyMessage: string | null;
@@ -33,7 +31,7 @@ function DistributionRow({ label, count, max }: { label: string; count: number; 
   );
 }
 
-export function Result({ status, answer, maxAttempts, stats, copyMessage }: ResultProps) {
+export function Result({ status, maxAttempts, stats, copyMessage }: ResultProps) {
   const won = status === GAME_STATUS.WON;
   const [msLeft, setMsLeft] = useState(() => getMsUntilNextSeed());
 
@@ -49,9 +47,6 @@ export function Result({ status, answer, maxAttempts, stats, copyMessage }: Resu
     <Box flexDirection="column" marginTop={1}>
       <Text bold color={won ? 'cyanBright' : 'red'}>
         {won ? '정답입니다! 🎉' : '아쉬워요, 오늘은 실패!'}
-      </Text>
-      <Text>
-        오늘의 단어: <Text bold>{answer.display}</Text>
       </Text>
 
       <Box flexDirection="column" marginTop={1}>

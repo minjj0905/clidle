@@ -130,7 +130,6 @@ export function App({ remote, validWords }: AppProps) {
       {status !== GAME_STATUS.PLAYING && (
         <Result
           status={status}
-          answer={game.answer}
           maxAttempts={game.maxAttempts}
           stats={stats}
           copyMessage={copyMessage}
