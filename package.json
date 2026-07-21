@@ -11,7 +11,8 @@
     "start": "tsx src/index.tsx",
     "build": "tsc",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "preprocess": "tsx scripts/preprocess.ts"
   },
   "license": "MIT",
   "devDependencies": {
