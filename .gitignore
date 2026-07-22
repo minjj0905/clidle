@@ -34,5 +34,8 @@ Thumbs.db
 # Local docs (not for public repo)
 docs/
 
+# 로컬 개발 편의 스크립트
+dev.sh
+
 # 원본 단어 데이터 (저작권 있는 외부 출처, 배포 불가)
 scripts/raw/

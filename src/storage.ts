@@ -11,9 +11,16 @@ export interface SavedState {
   status: GameStatus;
 }
 
+export interface Config {
+  nudgeEnabled: boolean;
+}
+
 export const DEFAULT_STATE_FILE = join(homedir(), '.clidle', 'state.json');
 export const DEFAULT_STATS_FILE = join(homedir(), '.clidle', 'stats.json');
 export const DEFAULT_DEVICE_FILE = join(homedir(), '.clidle', 'device.json');
+export const DEFAULT_CONFIG_FILE = join(homedir(), '.clidle', 'config.json');
+
+const DEFAULT_CONFIG: Config = { nudgeEnabled: true };
 
 /**
  * 저장된 진행 상황을 불러온다. 시드가 다르거나(=날짜가 바뀜) 파일이 없거나
@@ -93,4 +100,30 @@ export function getOrCreateDeviceId(filePath: string = DEFAULT_DEVICE_FILE): str
     // 저장 실패는 무시한다.
   }
   return deviceId;
+}
+
+/**
+ * 사용자 설정을 불러온다. 파일이 없거나 손상된 경우 기본값을 반환한다.
+ */
+export function loadConfig(filePath: string = DEFAULT_CONFIG_FILE): Config {
+  try {
+    if (!existsSync(filePath)) return DEFAULT_CONFIG;
+    const raw = readFileSync(filePath, 'utf-8');
+    return { ...DEFAULT_CONFIG, ...JSON.parse(raw) };
+  } catch {
+    return DEFAULT_CONFIG;
+  }
+}
+
+/**
+ * 사용자 설정을 저장한다. 저장 실패는 게임 진행에 영향을 주지 않는다.
+ */
+export function saveConfig(config: Config, filePath: string = DEFAULT_CONFIG_FILE): void {
+  try {
+    const dir = dirname(filePath);
+    if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
+    writeFileSync(filePath, JSON.stringify(config), 'utf-8');
+  } catch {
+    // 저장 실패는 무시한다.
+  }
 }

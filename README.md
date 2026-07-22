@@ -28,14 +28,38 @@
 
 ## 설치 및 실행
 
+설치 없이 바로 실행:
+
 ```bash
-git clone https://github.com/minjj0905/clidle.git
-cd clidle
-npm install
-npm start
+npx clidle
 ```
 
-`npx clidle`로 바로 실행하는 배포는 준비 중입니다.
+매일 플레이한다면 전역 설치가 더 빠릅니다.
+
+```bash
+npm install -g clidle
+clidle
+```
+
+---
+
+## 오늘의 문제 알림 (선택)
+
+터미널을 새로 켤 때마다 오늘의 문제를 아직 안 풀었으면 알려주는 짧은 문구가 뜨게 할 수 있습니다.
+`~/.zshrc` (bash라면 `~/.bashrc`) 맨 아래에 한 줄만 추가하세요.
+
+```bash
+clidle status 2>/dev/null
+```
+
+(전역 설치가 안 되어 있다면 `npx clidle status 2>/dev/null`)
+
+알림이 필요 없다면 아래 명령으로 끄고 켤 수 있습니다.
+
+```bash
+clidle nudge off   # 알림 끄기
+clidle nudge on    # 알림 다시 켜기
+```
 
 ---
 
@@ -112,7 +136,7 @@ CLIDLE 20260716 3/6
 🟦🟦🟦🟦🟦
 ```
 
-- 진행 상황은 `~/.clidle/state.json`에, 통계는 `~/.clidle/stats.json`에, 익명 기기 식별자는 `~/.clidle/device.json`에 저장됩니다.
+- 진행 상황은 `~/.clidle/state.json`에, 통계는 `~/.clidle/stats.json`에, 익명 기기 식별자는 `~/.clidle/device.json`에, 알림 설정은 `~/.clidle/config.json`에 저장됩니다.
 
 ---
 
