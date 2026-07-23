@@ -225,7 +225,7 @@ function getDailyWord(words, seed) {
 - [x] README 작성 (설치 및 실행 방법)
 - [x] 결과 공유 기능 (이모지 힌트 텍스트 클립보드 복사)
 - [x] 통계 기능 (전체 도전/정답률/연속 정답/도전 분포)
-- [ ] npm 패키지 배포 (`npx clidle`) 검토 — Phase 5(백엔드 전환) 이후 진행
+- [x] npm 패키지 배포 (`npx clidle`) — https://www.npmjs.com/package/clidle
 
 ### Phase 5 - 백엔드 전환 (Vercel + Supabase)
 스포일러 방지(단어 전체를 클라이언트에 번들하지 않음), 단어 관리 백오피스, 플레이 통계 수집을 위해 클라이언트-서버 구조로 전환. 상세 설계는 `/Users/min/.claude/plans/peaceful-knitting-shore.md` 참고.
@@ -234,9 +234,9 @@ function getDailyWord(words, seed) {
 - [x] `backend/` Next.js 프로젝트 골격 + `/api/today`, `/api/stats` API
 - [x] 관리자 백오피스 (`/admin/login`, `/admin/words`, `/admin/stats`, Supabase Auth 이메일 로그인)
 - [x] CLI 연동 (`src/api.ts` 신규, `game.ts`에 서버 정답 주입 경로 추가, `index.tsx` 비동기 전환, 기기 식별자 저장, 통계 fire-and-forget 전송)
-- [ ] Supabase 프로젝트 실제 생성 + 단어 이관 실행 (사용자 계정 필요, `backend/README.md` 참고)
-- [ ] Vercel 배포 + `src/api.ts`의 `DEFAULT_API_URL`을 실제 배포 URL로 갱신
-- [ ] 엔드투엔드 검증 (배포된 백엔드 대상으로 `npm start` 플레이 테스트)
+- [x] Supabase 프로젝트 실제 생성 + 단어 이관 실행
+- [x] Vercel 배포 + `src/api.ts`의 `DEFAULT_API_URL`을 실제 배포 URL(`https://clidle.vercel.app`)로 갱신
+- [x] 엔드투엔드 검증 (배포된 백엔드 대상으로 `npx clidle` 플레이 테스트)
 
 ---
 
@@ -277,10 +277,11 @@ clidle/
 ## 10. 기타 고려사항
 
 ### 추후 검토
-- **결과 공유**: 힌트 이모지 패턴을 텍스트로 클립보드 복사 (트위터/슬랙 공유용)
-- **연속 정답(streak) 기록**: 로컬 파일에 저장
-- **npx 실행**: `npx clidle` 한 줄로 실행 가능하도록 배포
 - **12슬롯 모드**: 추후 확장 가능성 열어둠
+
+### 터미널 알림(넛지) (구현됨)
+- 터미널 시작 훅에서 `clidle status` 실행 시, 오늘 문제를 아직 안 풀었으면 짧은 안내 문구 출력
+- `clidle nudge off`/`on`으로 알림 끄고 켤 수 있음 (설정은 `~/.clidle/config.json`)
 
 ### 진행 상황 저장/복원 (구현됨)
 - `~/.clidle/state.json`에 오늘의 시드/시도 기록/상태를 매 제출마다 저장
