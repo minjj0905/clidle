@@ -1,5 +1,7 @@
 # CLIDLE
 
+[![npm version](https://img.shields.io/npm/v/clidle.svg)](https://www.npmjs.com/package/clidle)
+
 ```
   ██████╗██╗     ██╗██████╗ ██╗     ███████╗
  ██╔════╝██║     ██║██╔══██╗██║     ██╔════╝
