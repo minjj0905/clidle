@@ -1,6 +1,6 @@
 {
   "name": "clidle",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "터미널에서 두벌식 로마자 입력으로 한글 자모를 맞히는 CLI 단어 게임",
   "type": "module",
   "main": "dist/index.js",
