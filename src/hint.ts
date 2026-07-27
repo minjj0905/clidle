@@ -7,7 +7,7 @@ export const HINT = {
 export type Hint = (typeof HINT)[keyof typeof HINT];
 
 /**
- * 자모 배열 두 개를 인덱스 기준으로 비교해 힌트를 계산한다 (Wordle 표준 알고리즘).
+ * 자모 배열 두 개를 인덱스 기준으로 비교해 힌트를 계산한다.
  * 1. 정확 일치(EXACT) 먼저 처리
  * 2. 나머지에서 포함 여부(PRESENT) 처리 (중복 자모는 남은 개수만큼만 매칭)
  * 3. 그 외 없음(ABSENT)

@@ -2,7 +2,7 @@ import { Box, Text } from 'ink';
 import { HINT, type Hint } from '../hint.js';
 import type { Attempt } from '../game.js';
 
-// NYT Wordle의 초록/노랑/회색 3색 조합을 피하고 청록/자홍/회색 계열을 사용한다.
+// 기존 단어 게임에서 흔한 초록/노랑/회색 조합을 피해 청록/자홍/회색 계열을 사용한다.
 export const HINT_COLOR: Record<Hint, string> = {
   [HINT.EXACT]: 'cyanBright',
   [HINT.PRESENT]: 'magentaBright',

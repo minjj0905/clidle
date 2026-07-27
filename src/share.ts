@@ -10,7 +10,7 @@ const HINT_EMOJI: Record<Hint, string> = {
 };
 
 /**
- * Wordle류 사이트에서 흔히 쓰는 "결과 공유" 텍스트를 생성한다.
+ * 오늘의 결과를 이모지 격자로 표현한 "결과 공유" 텍스트를 생성한다.
  * @example buildShareText(20260716, attempts, 6, true) // "CLIDLE 20260716 3/6\n\n🟨🟩..."
  */
 export function buildShareText(
