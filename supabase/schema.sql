@@ -38,8 +38,9 @@ create table if not exists play_events (
 
 create index if not exists play_events_seed_idx on play_events (seed);
 
--- /api/guess 브루트포스 방지: IP+시드 기준 하루 시도 횟수 상한, IP 기준 순간 요청 속도 제한에 쓴다.
--- deviceId는 클라이언트가 임의로 새로 만들 수 있어 신뢰하지 않고 기록만 남긴다.
+-- /api/guess 제한 판정용. 하루 시도 횟수는 device_id+시드 기준으로 세어 같은 공유기를 쓰는
+-- 사용자끼리 서로의 횟수를 깎아먹지 않게 한다. device_id는 클라이언트가 새로 만들어 우회할 수
+-- 있으므로 IP 기준으로는 훨씬 느슨한 상한(버스트/일일 총량)만 별도로 건다.
 create table if not exists guess_attempts (
   id bigint generated always as identity primary key,
   ip text not null,
@@ -51,6 +52,8 @@ create table if not exists guess_attempts (
 
 create index if not exists guess_attempts_ip_seed_idx on guess_attempts (ip, seed);
 create index if not exists guess_attempts_ip_created_idx on guess_attempts (ip, created_at);
+create index if not exists guess_attempts_device_seed_idx on guess_attempts (device_id, seed);
+create index if not exists guess_attempts_device_created_idx on guess_attempts (device_id, created_at);
 
 -- Supabase Auth로 로그인은 누구나 가능하지만,
 -- 실제 백오피스 API는 여기 등록된 이메일만 통과시킨다.

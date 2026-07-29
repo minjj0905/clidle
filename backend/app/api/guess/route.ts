@@ -55,7 +55,12 @@ export async function POST(request: Request) {
   }
 
   const maxAttempts = MAX_ATTEMPTS_BY_SLOT[answer.slot]!;
-  const limitCheck = await checkGuessAllowed(supabase, { ip, seed: body.seed, maxAttempts });
+  const limitCheck = await checkGuessAllowed(supabase, {
+    ip,
+    deviceId: body.deviceId,
+    seed: body.seed,
+    maxAttempts,
+  });
   if (!limitCheck.allowed) {
     return NextResponse.json({ error: limitCheck.reason }, { status: 429 });
   }
