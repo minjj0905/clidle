@@ -8,11 +8,15 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 
   const { id } = await params;
   const body = await request.json().catch(() => null);
-  if (typeof body?.isActive !== 'boolean') {
-    return NextResponse.json({ error: 'isActive(boolean)가 필요합니다.' }, { status: 400 });
+
+  const patch: { is_active?: boolean; is_answer_pool?: boolean } = {};
+  if (typeof body?.isActive === 'boolean') patch.is_active = body.isActive;
+  if (typeof body?.isAnswerPool === 'boolean') patch.is_answer_pool = body.isAnswerPool;
+  if (Object.keys(patch).length === 0) {
+    return NextResponse.json({ error: 'isActive 또는 isAnswerPool(boolean)이 필요합니다.' }, { status: 400 });
   }
 
-  const { error } = await supabaseAdmin().from('words').update({ is_active: body.isActive }).eq('id', id);
+  const { error } = await supabaseAdmin().from('words').update(patch).eq('id', id);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json({ ok: true });
 }

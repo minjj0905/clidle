@@ -12,7 +12,7 @@ export async function GET(request: Request) {
   const slot = searchParams.get('slot');
   const search = searchParams.get('search');
 
-  let query = supabaseAdmin().from('words').select('id, display, jamo, slot, is_active, created_at').order('id', { ascending: false }).limit(200);
+  let query = supabaseAdmin().from('words').select('id, display, jamo, slot, is_active, is_answer_pool, created_at').order('id', { ascending: false }).limit(200);
   if (slot) query = query.eq('slot', Number(slot));
   if (search) query = query.ilike('display', `%${search}%`);
 
@@ -36,9 +36,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: '자모 5~7개로 분해되는 단어만 등록할 수 있습니다.' }, { status: 400 });
   }
 
+  // is_answer_pool을 지정하지 않으면 컬럼 기본값(true)이 들어가 바로 정답 후보가 된다.
+  const isAnswerPool = typeof body?.isAnswerPool === 'boolean' ? body.isAnswerPool : true;
+
   const { data, error } = await supabaseAdmin()
     .from('words')
-    .insert({ display, jamo, slot: jamo.length })
+    .insert({ display, jamo, slot: jamo.length, is_answer_pool: isAnswerPool })
     .select()
     .single();
 
