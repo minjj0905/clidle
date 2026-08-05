@@ -12,7 +12,7 @@ if (!globalThis.WebSocket) {
 }
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const DATA_DIR = path.join(__dirname, '../src/data');
+const DATA_DIR = path.join(__dirname, 'raw');
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;

@@ -29,9 +29,11 @@ src/
   share.ts      결과 공유 텍스트 생성 / 클립보드 복사
   types.ts      공용 타입 정의
   render/       TUI 렌더링 컴포넌트 (title/board/keyboard/legend/result)
-  data/         words_5/6/7.json 단어 DB 원본 (전처리 결과물, 백엔드 이관용)
 scripts/
-  preprocess.ts, import-words.ts, import-nouns.ts  단어 DB 전처리/이관
+  build-answer-pool.ts  정답 풀/입력 풀 재구축 (`npm run build-pool`)
+  sync-words.ts         재구축 결과를 Supabase words 테이블에 반영 (`npm run sync-words`)
+  preprocess.ts, import-words.ts, import-nouns.ts  구 전처리/이관 파이프라인 (위 두 스크립트로 대체됨)
+  raw/          단어 원본·산출물 (gitignore — 정답 풀 노출 방지)
 backend/        Vercel(Next.js) API + 관리자 백오피스 (자체 README 참고)
 docs/           (gitignore — 로컬 전용 메모)
 ```
@@ -49,6 +51,9 @@ docs/           (gitignore — 로컬 전용 메모)
 - 쌍자음: 같은 자음 두 번 입력하면 단자음 두 슬롯으로 쌓임 (`rr`→ㄱ,ㄱ / `ee`→ㄷ,ㄷ / `qq`→ㅂ,ㅂ / `tt`→ㅅ,ㅅ / `ww`→ㅈ,ㅈ), 합쳐지지 않음
 - 모음은 전용 키가 있는 기본 10개(ㅏㅑㅓㅕㅗㅛㅜㅠㅡㅣ)만 직접 입력 가능, 나머지 겹모음(ㅐㅒㅔㅖㅘㅙㅚㅝㅞㅟㅢ)은 조합 없이 각각 별도 슬롯 (예: ㅐ=ㅏ+ㅣ, ㅙ=ㅗ+ㅏ+ㅣ)
 - 날짜 시드는 KST 기준
+- **단어 풀은 명사만** 쓴다. 동사·형용사(`세우다`), 부사(`가득`), 관형사·대명사·수사(`모든`/`무엇`/`아홉`)는 정답 풀뿐 아니라 입력 풀에서도 제외
+- 정답 풀(`is_answer_pool=true`)은 보편적인 명사만, 입력 풀(`false`)은 저빈도·전문어까지 폭넓게 허용
+- 정답 풀 목록은 퍼블릭 레포에 커밋하지 않는다 (산출물은 gitignore된 `scripts/raw/`에만 둔다)
 
 ## 힌트 로직
 

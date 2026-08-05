@@ -34,7 +34,9 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "preprocess": "tsx scripts/preprocess.ts",
-    "import-words": "tsx scripts/import-words.ts"
+    "import-words": "tsx scripts/import-words.ts",
+    "build-pool": "tsx scripts/build-answer-pool.ts",
+    "sync-words": "tsx scripts/sync-words.ts"
   },
   "license": "MIT",
   "devDependencies": {

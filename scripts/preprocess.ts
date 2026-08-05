@@ -6,7 +6,7 @@ import type { WordEntry } from '../src/types.ts';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const RAW_PATH = path.join(__dirname, 'raw/words-raw.txt');
-const DATA_DIR = path.join(__dirname, '../src/data');
+const DATA_DIR = path.join(__dirname, 'raw');
 
 function loadExisting(slot: number): WordEntry[] {
   try {
